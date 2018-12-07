@@ -1,0 +1,51 @@
+################################################################
+author: Jaime_A_Castro_Mondragon
+
+###############################
+## Expected folder structure ##
+###############################
+
+## The Snakefile will launch a motif analysis + calculate centrality for each discovered motifs for every set of peaks in Narrowpeak format found in the 'data_folder'.
+##
+## Example:
+## ls data_folder
+##
+## 
+
+## ======================== ##
+## Paths to scripts + data  ##
+## ======================== ##
+data_folder : /storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/ChIP-atlas/data
+bin : /storage/mathelierarea/processed/anthoma/Projects/JASPAR2018/bin
+bin_jaspar_2020 : /storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/bin
+python : python2.7
+RSAT : /lsc/rsat
+
+
+## =========== ##
+##  hg38 files ##
+## =========== ##
+genome_fasta : /storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/ChIP-atlas/genomes/ce10.fa
+genome_size : /storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/ChIP-atlas/genomes/ce10.chrom.sizes
+
+
+## ============================= ##
+## TF - JASPAR association table ##
+## ============================= ##
+TF_Experiment_map : /storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/ChIP-atlas/experiment_table/experimentList_TFs_and_others.tab
+
+
+## ================== ##
+## Output directories ##
+## ================== ##
+out_dir : /storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/ChIP-atlas/ChIP-atlas_results
+
+
+## ======================================== ##
+## Motif discovery (peak-motifs) parameters ##
+## ======================================== ##
+peakmotifs_disco : oligos,dyads,positions,local_words
+peakmotifs_disco_nb_motifs : 2
+peakmotifs_disco_min_oligo : 6
+peakmotifs_disco_max_oligo : 7
+peakmotifs_class_interval : 25
