@@ -1,0 +1,35 @@
+#########################################
+## Download ChIP-atlas experiment list ##
+#########################################
+
+Download information: https://github.com/inutano/chip-atlas/wiki#downloads_doc
+
+1. Download experiment table: wget http://dbarchive.biosciencedbc.jp/kyushu-u/metadata/experimentList.tab
+
+2. Filter the table: more experimentList.tab | grep 'TFs and others'  | cut -f1,2,4,5,6,9 > experimentList_TFs_and_others.tab
+
+   Where:
+	1) Experiment ID
+	2) Genome
+	4) Antigen (TF name)
+	5) Cell type class
+	6) Cell type
+
+
+###############################################################
+## Download c elegans (or other) genome size and fasta files ##
+###############################################################
+
+1. Go to UCSC download page: http://hgdownload.cse.ucsc.edu/downloads.html#c_elegans
+
+2. Look for the ce10 table 'Oct. 2010 (WS220/ce10)', click on 'Full data set'
+
+3. Download the genome size file: wget http://hgdownload.cse.ucsc.edu/goldenPath/ce10/bigZips/ce10.chrom.sizes
+
+4. Download the ce10 genome in 2bit format: wget http://hgdownload.cse.ucsc.edu/goldenPath/ce10/bigZips/ce10.2bit
+
+5. Download the script 2bittofa, this script convert the 2bit file into fasta sequences: wget http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/twoBitToFa
+
+6. Convert the 2bit file to fasta sequences: twoBitToFa ce10.2bit ce10.fa
+
+7. twoBitToFa information: http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/

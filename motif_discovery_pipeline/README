@@ -1,0 +1,8 @@
+JASPAR 2020
+
+Depending on the ChIP-seq data repository (e.g., ChIP-atlas or ENCODE) the pipeline may slightly vary. For this reason there is a folder for each repository with its respective Snakefile and Config file.
+
+This folder is divided in 2 subfolders:
+
+- bin       : with all the executable files called in the workflow.
+- CHIP-atlas: contains all the analysis performed in ChIP-atlas datasets + Snakefile + Config file 
