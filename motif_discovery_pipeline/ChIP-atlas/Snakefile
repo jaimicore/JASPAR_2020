@@ -301,7 +301,7 @@ rule JASPAR_PSSM_to_PWM:
 #     message:
 #         "; Generating PWM from JASPAR matrices - TF : {wildcards.TF} "
 #     params:
-#         scripts_bin = config["bin_jaspar_2020"]
+#         scripts_bin = config["bin"]
 #     shell:
 #         """
 #         python {params.scripts_bin}/compute_weblogo.py \
@@ -512,7 +512,7 @@ rule choose_best_centrimo_experiment:
     message:
         "; Selecting the most centrally enriched motif - TF : {wildcards.TF} "
     params:
-        scripts_bin = config["bin_jaspar_2020"]
+        scripts_bin = config["bin"]
     shell:
         """
         bash {params.scripts_bin}/best_centrimo.sh -i {input} > {output}
@@ -550,7 +550,7 @@ rule best_centrimo_experiment_logo:
     message:
         "; Generating latex logo for selected motif: {wildcards.TF} "
     params:
-        scripts_bin = config["bin_jaspar_2020"]
+        scripts_bin = config["bin"]
     shell:
         """
         bash {params.scripts_bin}/create_latex_logos.sh -i {input} -o {output}
