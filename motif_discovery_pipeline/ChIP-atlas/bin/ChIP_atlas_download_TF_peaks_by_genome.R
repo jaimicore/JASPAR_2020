@@ -150,5 +150,6 @@ sapply(genome, function(g){
                              "; wget http://dbarchive.biosciencedbc.jp/kyushu-u/", g, "/eachData/bed05/", experiment.tab.genome.parsed$Experiment_ID, ".05.bed -O ", experiment.tab.genome.parsed$File_download)
 
   plan(multiprocess, workers = 50)
-  future_sapply(experiment.tab.genome.parsed$Command_download[1:15], system)
+  # future_sapply(experiment.tab.genome.parsed$Command_download[1:15], system)
+  future_sapply(experiment.tab.genome.parsed$Command_download, system)
 })
