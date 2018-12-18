@@ -22,9 +22,9 @@ python : python2.7
 RSAT : /lsc/rsat
 
 
-## =========== ##
-##  hg38 files ##
-## =========== ##
+## ============= ##
+##  Genome files ##
+## ============= ##
 genome_fasta : /storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/ChIP-atlas/genomes/ce10.fa
 genome_size : /storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/ChIP-atlas/genomes/ce10.chrom.sizes
 
