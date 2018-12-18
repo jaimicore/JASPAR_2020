@@ -1,8 +1,18 @@
-JASPAR 2020
+# JASPAR 2020
 
 Depending on the ChIP-seq data repository (e.g., ChIP-atlas or ENCODE) the pipeline may slightly vary. For this reason there is a folder for each repository with its respective Snakefile and Config file.
 
 This folder is divided in 2 subfolders:
 
 - bin       : with all the executable files called in the workflow.
-- CHIP-atlas: contains all the analysis performed in ChIP-atlas datasets + Snakefile + Config file 
+- CHIP-atlas: contains all the analysis performed in ChIP-atlas datasets + Snakefile + Config file
+
+
+## Download ChIP-seq datasets from ChIP-atlas
+
+// Change the directory
+cd motif_discovery_pipeline/ChIP-atlas
+
+// Call the script. You must specify the directory (. in this example) and the genome version (ce10, in this case for C elegans)
+Rscript bin/ChIP_atlas_download_TF_peaks_by_genome.R . ce10
+
