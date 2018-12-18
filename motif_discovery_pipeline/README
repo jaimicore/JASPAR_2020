@@ -8,6 +8,18 @@ This folder is divided in 2 subfolders:
 - CHIP-atlas: contains all the analysis performed in ChIP-atlas datasets + Snakefile + Config file
 
 
+## Dependencies. The following software and R libraries must be installed in order to run the complete pipeline.
+
+- *R*
+  - data.table
+  - dplyr
+  - future.apply
+  - reshape2
+
+- *RSAT* (Regulatory Sequences analysis Tools) software: http://rsat-tagc.univ-mrs.fr/rsat/
+- *snakemake*: https://snakemake.readthedocs.io/en/stable/index.html
+
+
 ## Download ChIP-seq datasets from ChIP-atlas
 
 
@@ -62,7 +74,7 @@ twoBitToFa ce10.2bit ce10.fa
 
 The pipeline must be ran in two steps:
 
-- Step 1: motif discovery. The program *RSAT peak-motifs* is called, this program runs four motif discovery algorithms (over-represented k-mers, over-represented spaced-k-mers, positionally biased k-mers, k-mers enriched in central windows) to discover significant motifs, see 10.1093/nar/gkr1104. This can be launched by running the *Snakefile*, you can parallelize the process ussing the argument *--cores*.
+- Step 1: motif discovery. The program *RSAT peak-motifs* is called, this program runs four motif discovery algorithms (over-represented k-mers, over-represented spaced-k-mers, positionally biased k-mers, k-mers enriched in central windows) to discover significant motifs, see 10.1093/nar/gkr1104. This can be launched by running the *Snakefile*, you can parallelize the process using the argument *--cores*.
 
 The *Snakefile* contain a series of rules, for the motif discovery steps, it searched for the datasets in *narrowPeak* format. 
 
@@ -74,7 +86,7 @@ snakemake [--cores X]
 
 - Step 2: selecting centrally enriched motifs. Note that given the ChIP-seq dataset quality and the number of peaks, many datasets may not produce any significant motif. This step must be ran after completed the motif discovery step.
 
-The *Snakefile* will searche for the motifs in fasta format obtained from *RSAT peak-motifs*. 
+The *Snakefile* will search for the motifs in fasta format obtained from *RSAT peak-motifs*. 
 
 
 ```
