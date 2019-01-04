@@ -39,28 +39,31 @@ then
     exit 1;
 fi;
 
-BIN=/storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/bin
+BIN=/storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/jaspar_2020/motif_discovery_pipeline/bin
 cat $BIN/latex_header.txt > $output;
 sort -k3,3 -k5,5n $input | \
+#more $input | \
 while read line
 do
     tfname=$(echo $line | cut -d ' ' -f 3 | tr '_' '-');
+    exp_ID=$(echo $line | cut -d ' ' -f 1);
     centrimo_file=$(echo $line | cut -d ' ' -f 4);
     centrimo_pval=$(echo $line | cut -d ' ' -f 5);
     motif_logo=$(echo $line | cut -d ' ' -f 6);
-    if (( $(echo "$centrimo_pval < 0." | bc -l) ))
-    then
+   # if (( $(echo "$centrimo_pval < 0." | bc -l) ))
+    #then
         #echo "TFname "$tfname;
         #echo "file "$centrimo_file;
         #echo "pval "$centrimo_pval;
-        echo "\\section*{$tfname}";
-        echo "Centrimo p-value = $centrimo_pval \\\\";
+    echo "\\section*{$tfname}";
+    echo "\\section*{$exp_ID}";
+    echo "Centrimo p-value = $centrimo_pval \\\\";
 	#echo "Motif logo = $motif_logo \\\\";
         # pwmdir=$(dirname $centrimo_file);
         # echo -n "\\path{$pwmdir} \\\\";
         # pwmname=$(basename $centrimo_file .pssm.501bp.fa.sites.centrimo);
-        echo "\\includegraphics{$motif_logo}";
-    fi;
+    echo "\\includegraphics{$motif_logo}";
+    #fi;
 done >> $output;
 echo "\\end{document}" >> $output;
 outdir=$(dirname $output);
