@@ -16,7 +16,7 @@ author: Jaime_A_Castro_Mondragon
 ## Paths to scripts + data  ##
 ## ======================== ##
 data_folder : ChIP-atlas/data
-bin : bin
+bin : ../bin
 bin_jaspar_2020 : /storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/bin
 python : python2.7
 RSAT : /lsc/rsat
