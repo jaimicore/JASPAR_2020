@@ -72,7 +72,7 @@ CENTRIMO_PVAL = expand(os.path.join(config["out_dir"], "{TF}", "central_enrichme
 CENTRIMO_PLOT = expand(os.path.join(config["out_dir"], "{TF}", "central_enrichment", "{TF}_m{n}.501bp.fa.sites.centrimo.pdf"), zip, TF = TFs, n = NB)
 CENTRIMO_BEST = expand(os.path.join(config["out_dir"], "{TF}", "central_enrichment", "selected_motif", "{TF}.501bp.fa.sites.centrimo.best"), TF = TFs)
 MOST_ENRICHED_MOTIF_ASSOC = expand(os.path.join(config["out_dir"], "{TF}", "central_enrichment", "selected_motif", "{TF}.501bp.fa.sites.centrimo.best.TF_associated"), TF = TFs)
-MOST_ENRICHED_MOTIF_ASSOC_LOGO = dynamic(expand(os.path.join(config["out_dir"], "{TF}", "central_enrichment", "selected_motif", "{TF}.501bp.fa.sites.centrimo.best.TF_associated.tex"), TF = TFs, n = NB))
+MOST_ENRICHED_MOTIF_ASSOC_LOGO = expand(os.path.join(config["out_dir"], "{TF}", "central_enrichment", "selected_motif", "{TF}.501bp.fa.sites.centrimo.best.TF_associated.tex"), TF = TFs, n = NB)
 
 
 ################################################################
@@ -324,6 +324,8 @@ rule Generate_matrix_logo:
         logo_dir = os.path.join(config["out_dir"], "{TF}", "motifs", "jaspar", "logos"),
         logo_name = "{TF}_peak-motifs_m{n}",
         RSAT = config["RSAT"]
+    priority:
+        94
     shell:
         """
         {params.RSAT}/perl-scripts/convert-matrix -v 2 \
@@ -354,6 +356,8 @@ rule find_RSAT_matrix_sites:
         "; Scanning PSSM on 101bp peaks - TF : {wildcards.TF} - Matrix number: {wildcards.n}"
     params:
         RSAT = config["RSAT"]
+    priority:
+        93
     shell:
         """
         {params.RSAT}/bin/matrix-scan-quick \
@@ -377,6 +381,8 @@ rule convert_RSAT_matrix_sites_to_BED:
         "; Obtaining genomic coordinates for sites - TF : {wildcards.TF} - Matrix number: {wildcards.n}"
     params:
         scripts_bin = config["bin"]
+    priority:
+        92
     shell:
         """
         awk -f {params.scripts_bin}/sites-to-bed.awk {input} > {output}
@@ -395,6 +401,8 @@ rule get_RSAT_matrix_sites_fasta:
         "; Obtaining fasta sequences from genomic coordinates for TFBS sites - TF : {wildcards.TF} - Matrix number: {wildcards.n}"
     params:
         genome_fasta = config["genome_fasta"]
+    priority:
+        91
     shell:
         """
         bedtools getfasta -name -s -fi {params.genome_fasta} -bed {input} -fo {output}
@@ -431,6 +439,8 @@ rule Scan_JASPAR_PWM:
         "; Scanning PSSM - TF : {wildcards.TF} - Matrix number: {wildcards.n}"
     params:
         scripts_bin = config["bin"]
+    priority:
+        90
     shell:
         """
         {params.scripts_bin}/pwm_searchPFF {input.pwm} {input.peaks} 0.85 -b > {output}
@@ -440,20 +450,20 @@ rule Scan_JASPAR_PWM:
 #######################
 ## Centrimo analysis ##
 #######################
-rule create_centrimo_folders:
-    """ 
-    Create central enrichment folder for each TF (experiment).
-    """
-    input:
-        os.path.join(config["out_dir"], "{TF}")
-    output:
-        os.path.join(config["out_dir"], "{TF}", "central_enrichment")
-    message:
-        "; Creating central enrichment folders - TF : {wildcards.TF} "
-    shell:
-        """
-        mkdir -p {output}
-        """
+# rule create_centrimo_folders:
+#     """ 
+#     Create central enrichment folder for each TF (experiment).
+#     """
+#     input:
+#         os.path.join(config["out_dir"], "{TF}")
+#     output:
+#         directory(os.path.join(config["out_dir"], "{TF}", "central_enrichment"))
+#     message:
+#         "; Creating central enrichment folders - TF : {wildcards.TF} "
+#     shell:
+#         """
+#         mkdir -p {output}
+#         """
 
         
 rule Calculate_centrimo_pvalue:
@@ -468,11 +478,14 @@ rule Calculate_centrimo_pvalue:
     message:
         "; Calculating central enrichment around peak summits - TF : {wildcards.TF} - Matrix number: {wildcards.n}"
     params:
-        scripts_bin = config["bin"]
+        scripts_bin = config["bin"],
+        centrimo_folder = os.path.join(config["out_dir"], "{TF}", "central_enrichment")
     priority:
-        50
+        89
     shell:
         """
+        mkdir -p {params.centrimo_folder} ; 
+
         nb_TFBS="$(wc -l {input.sites} | cut -d ' ' -f 1)" ;
 
         nb_peaks="$(wc -l {input.peaks} | cut -d " " -f 1)" ;
@@ -494,7 +507,7 @@ rule generate_centrimo_plots:
     params:
         scripts_bin = config["bin"]
     priority:
-        40
+        88
     shell:
         """
         R --vanilla --slave --silent -f {params.scripts_bin}/centrimo_plot.R --args {input} {output}
@@ -506,22 +519,25 @@ rule choose_best_centrimo_experiment:
     Select the motif with the best (lowest) centrimo p-value.
     """
     input:
-        os.path.join(config["out_dir"], "{TF}", "central_enrichment")
+        os.path.join(config["out_dir"], "{TF}", "motifs", "jaspar", "pfm", "{TF}_matrix_list.tab")
     output:
         os.path.join(config["out_dir"], "{TF}", "central_enrichment", "selected_motif", "{TF}.501bp.fa.sites.centrimo.best")
     message:
         "; Selecting the most centrally enriched motif - TF : {wildcards.TF} "
     params:
-        scripts_bin = config["bin"]
+        scripts_bin = config["bin"],
+        centrimo_dir = os.path.join(config["out_dir"], "{TF}", "central_enrichment")
+    priority:
+        87
     shell:
         """
-        bash {params.scripts_bin}/best_centrimo.sh -i {input} > {output}
+        bash {params.scripts_bin}/best_centrimo.sh -i {params.centrimo_dir} > {output}
         """
 
 
 rule annotate_best_centrimo_experiment:
     """ 
-    assing the TF name to the selected motif.
+    Assing the TF name to the selected motif.
     """
     input:
         tf_jaspar_map = config["TF_Experiment_map"],
@@ -530,14 +546,21 @@ rule annotate_best_centrimo_experiment:
         os.path.join(config["out_dir"], "{TF}", "central_enrichment", "selected_motif", "{TF}.501bp.fa.sites.centrimo.best.TF_associated")
     message:
         "; Assigning TF name to the experiment: {wildcards.TF} "
+    priority:
+        86
     shell:
         """
         motif_name="$(more {input.best_exp} | cut -f1 | xargs basename | cut -d'.' -f1 | perl -lne '$_ =~ s/_m(\\d+)$/_peak-motifs_m$1/g; print $_ ')";
 
         motif_folder="$(more {input.best_exp} | cut -f1 | xargs dirname | perl -lne '$_ =~ s/central_enrichment/motifs\/jaspar\/logos/gi; print $_')";
 
-        awk -v motif_n=$motif_name -v motif_f=$motif_folder 'NR==FNR{{mapping[$11] = $1}} NR!=FNR{{split($1, arr, "/"); split(arr[11], enc, "_"); print enc[1]"\\t"enc[3]"\\t"enc[3]"\\t"$0"\\t"motif_f"/"motif_n"_logo.png"}}' {input.tf_jaspar_map} {input.best_exp} > {output}
+        ##  -v: Pass variable as arguments
+        ##  
+        awk -v motif_n=$motif_name -v motif_f=$motif_folder 'NR==FNR{{mapping[$11] = $1}} NR!=FNR{{split($1, arr, "/"); split(arr[3], enc, "_"); print enc[1]"\\t"enc[3]"\\t"enc[3]"\\t"$0"\\t"motif_f"/"motif_n"_logo.png"}}' {input.tf_jaspar_map} {input.best_exp} > {output}
         """
+
+
+# awk -v motif_n=$motif_name -v motif_f=$motif_folder 'NR==FNR{mapping[$11] = $1} NR!=FNR{split($1, arr, "/"); split(arr[11], enc, "_"); print enc[1]"\t"enc[3]"\t"enc[3]"\t"$0"\t"motif_f"/"motif_n"_logo.png"}' ChIP-atlas/experiment_table/experimentList_TFs_and_others.tab ChIP-atlas/ChIP-atlas_results/ERX1270344_Unclassified_lir-3/central_enrichment/selected_motif/ERX1270344_Unclassified_lir-3.501bp.fa.sites.centrimo.best
         
 rule best_centrimo_experiment_logo:
     """ 
@@ -546,11 +569,13 @@ rule best_centrimo_experiment_logo:
     input:
         os.path.join(config["out_dir"], "{TF}", "central_enrichment", "selected_motif", "{TF}.501bp.fa.sites.centrimo.best.TF_associated")
     output:
-        dynamic(os.path.join(config["out_dir"], "{TF}", "central_enrichment", "selected_motif", "{TF}.501bp.fa.sites.centrimo.best.TF_associated.tex"))
+        os.path.join(config["out_dir"], "{TF}", "central_enrichment", "selected_motif", "{TF}.501bp.fa.sites.centrimo.best.TF_associated.tex")
     message:
         "; Generating latex logo for selected motif: {wildcards.TF} "
     params:
         scripts_bin = config["bin"]
+    priority:
+        85
     shell:
         """
         bash {params.scripts_bin}/create_latex_logos.sh -i {input} -o {output}
