@@ -560,7 +560,8 @@ rule annotate_best_centrimo_experiment:
         """
 
 
-# awk -v motif_n=$motif_name -v motif_f=$motif_folder 'NR==FNR{mapping[$11] = $1} NR!=FNR{split($1, arr, "/"); split(arr[11], enc, "_"); print enc[1]"\t"enc[3]"\t"enc[3]"\t"$0"\t"motif_f"/"motif_n"_logo.png"}' ChIP-atlas/experiment_table/experimentList_TFs_and_others.tab ChIP-atlas/ChIP-atlas_results/ERX1270344_Unclassified_lir-3/central_enrichment/selected_motif/ERX1270344_Unclassified_lir-3.501bp.fa.sites.centrimo.best
+# bash ../bin/create_latex_logos.sh -i ChIP-atlas/ChIP-atlas_results/ERX1270343_Unclassified_lir-3/central_enrichment/selected_motif/ERX1270343_Unclassified_lir-3.501bp.fa.sites.centrimo.best.TF_associated -o ChIP-atlas/ChIP-atlas_results/ERX1270343_Unclassified_lir-3/central_enrichment/selected_motif/ERX1270343_Unclassified_lir-3.501bp.fa.sites.centrimo.best.TF_associated.tex
+
         
 rule best_centrimo_experiment_logo:
     """ 
