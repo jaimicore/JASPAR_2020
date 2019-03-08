@@ -73,12 +73,11 @@ Rscript bin/ChIP_atlas_download_TF_peaks_by_genome.R . sacCer3  ## S Cereviseae
 
 ## Configuration file
 
-##
+Set the following variables in the config file:
 
-bin : ../bin
-bin_jaspar_2020 : /storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/bin
-python : python2.7
-RSAT : /lsc/rsat
+- *bin* : ../bin (Assumong that you are in the *motif_discovery_pipeline/ChIP-atlas* folder)
+- *python* : python2.7 (Example)
+- *RSAT* : /lsc/rsat (Example, ``` echo $RSAT ```)
 
 
 
@@ -109,7 +108,7 @@ snakemake [--cores X]
 
 ### rule RSAT_peakmotifs_per_exp
 
-- *RSAT peak-motifs* none motif found: verify that the input *NarrowPeak* is not empty. In the case of ChUP-atlas, many of the downloaded files are empty, to avoid this error, remove these files before launching the pipeline.
+- *RSAT peak-motifs* none motif found: verify that the input *NarrowPeak* is not empty. In the case of ChIP-atlas, many of the downloaded files are empty, to avoid this error, remove these files before launching the pipeline.
 
 - *RSAT local-word-analysis* python version: this program is written in python and called within RSAT peak-motifs. In case that the default python environment is 3.5, local-word-analysis will not run, therefore the solution is modify directly the line in the $RSAT/perl-scripts/peak-motifs script adding "python2.7" before the program is called.
 
@@ -123,4 +122,4 @@ snakemake [--cores X]
 
 ### rule best_centrimo_experiment_logo
 
-- Input files not found: this may occur when the Experiment_TF ID contains certain characters as: *(*, *)*, *[*, *]*, *.*, */*, " "(one or more spaces). Before launching the pipeline, verify that none of the folders in your data folder contains such characters, the simplest option is remove them or substitute them by *-*. Note that this step was already implemented for the ChIP-atlas datasets.
+- Input files not found: this may occur when the Experiment_TF ID contains certain characters as: *(*, *)*, *[*, *]*, *.*, */*, " "(one or more spaces). Before launching the pipeline, verify that none of the folders in your data folder contains such characters, the simplest option is remove them or substitute them by '*-*'. Note that this step was already implemented for the ChIP-atlas datasets.
