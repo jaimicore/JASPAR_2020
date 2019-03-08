@@ -211,7 +211,6 @@ rule RSAT_peakmotifs_per_exp:
         -noov \
         -2str \
         -origin center \
-        -motif_db cisBP_human tf {params.cisbp} \
         -motif_db jaspar_vertebrates tf {params.jaspar2018} \
         -scan_markov 1 \
         -task {params.task} \
@@ -579,9 +578,12 @@ rule best_centrimo_experiment_logo:
         85
     shell:
         """
-        bash {params.scripts_bin}/create_latex_logos.sh -i {input} -o {output}
+        bash {params.scripts_bin}/create_latex_logos.sh -i '{input}' -o '{output}'
         """
 
+
+
+        
 
 #bash /storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/bin/create_latex_logos.sh -i /storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/encode/ENCSR000BPX_A549_FOXA1/central_enrichment/selected_motif/ENCSR000BPX_A549_FOXA1.501bp.fa.sites.centrimo.best.TF_associated -o /storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/encode/ENCSR000BPX_A549_FOXA1/central_enrichment/selected_motif/ENCSR000BPX_A549_FOXA1.501bp.fa.sites.centrimo.best.TF_associated.tex
 
