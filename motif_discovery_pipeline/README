@@ -31,7 +31,7 @@ cd motif_discovery_pipeline/ChIP-atlas
 ```
 
 
-2. Launch the script. You must specify the directory ( current directory '.' in this example) and the genome version (ce10, C elegans). This program will first download the experiment table from ChIP-atlas and then all the experiments (narrowpeak format) for the given genome.
+2. Launch the script. You must specify the directory (current directory '.' in this example) and the genome version (ce10, C elegans). This program will first download the experiment table from ChIP-atlas and then all the experiments (narrowpeak format) for the given genome. This script checks the file size after the download, empty files are removed.
 ```
 Rscript bin/ChIP_atlas_download_TF_peaks_by_genome.R . ce10     ## C elegans
 Rscript bin/ChIP_atlas_download_TF_peaks_by_genome.R . dm3      ## D melanogaster
@@ -71,13 +71,24 @@ Rscript bin/ChIP_atlas_download_TF_peaks_by_genome.R . sacCer3  ## S Cereviseae
 8. Update the snakemake config file with the directory of the genome.
 
 
+## Configuration file
+
+##
+
+bin : ../bin
+bin_jaspar_2020 : /storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/bin
+python : python2.7
+RSAT : /lsc/rsat
+
+
+
 ## Launching the pipeline
 
 The pipeline must be ran in two steps:
 
 - Step 1: motif discovery. The program *RSAT peak-motifs* is called, this program runs four motif discovery algorithms (over-represented k-mers, over-represented spaced-k-mers, positionally biased k-mers, k-mers enriched in central windows) to discover significant motifs, see 10.1093/nar/gkr1104. This can be launched by running the *Snakefile*, you can parallelize the process using the argument *--cores*.
 
-The *Snakefile* contain a series of rules, for the motif discovery steps, it searched for the datasets in *narrowPeak* format. 
+The *Snakefile* contain a series of rules, for the motif discovery steps, it searches for datasets in *narrowPeak* format. 
 
 Once completed, this step will generate one folder per dataset with the *RSAT peak-motifs* results. 
 
@@ -85,11 +96,31 @@ Once completed, this step will generate one folder per dataset with the *RSAT pe
 snakemake [--cores X]
 ```
 
-- Step 2: selecting centrally enriched motifs. Note that given the ChIP-seq dataset quality and the number of peaks, many datasets may not produce any significant motif. This step must be ran after completed the motif discovery step.
-
-**The *Snakefile* will search for the motifs in fasta format obtained from *RSAT peak-motifs* .** So be sure to run this step after completing the step 1. 
+- Step 2: selecting centrally enriched motifs. Note that given the ChIP-seq dataset quality and the number of peaks may vary among the datasets, many datasets may not produce any significant motif. A priori, the number of discovered motifs is unknow, to avoid the use of *dynamic files*, the pipeline will consider as input all the discovered motifs in *transfac* format resulting from the step 1,**following certain folder structure** (resulting from the rules ran in the step 1, see NOTE 1 in the *Snakefile*). For this reason, the pipeline must be ran in two steps.
 
 
 ```
 snakemake [--cores X]
 ```
+
+
+## Troubleshooting
+
+
+## rule RSAT_peakmotifs_per_exp
+
+- *RSAT peak-motifs* none motif found: verify that the input *NarrowPeak* is not empty. In the case of ChUP-atlas, many of the downloaded files are empty, to avoid this error, remove these files before launching the pipeline.
+
+- *RSAT local-word-analysis* python version: this program is written in python and called within RSAT peak-motifs. In case that the default python environment is 3.5, local-word-analysis will not run, therefore the solution is modify directly the line in the $RSAT/perl-scripts/peak-motifs script adding "python2.7" before the program is called.
+
+- *RSAT position-analysis* founds highly repetitive/uninformative motifs: The default interval for position-analysis is 50nt, which is too large for the JASPAR pipeline (where the peaks have a size of 101), this may produce non-relevant artifact motifs. By changing the interval to 25 the program may found the expected TF motif. Note that this change was already set in the config file.
+
+
+## rule annotate_best_centrimo_experiment
+
+- Verify that the variables in the *awk* command correspond to the correct fields in your experiment table. The current *awk* variables in the rule are specific for the ChIP-atlas experiment table.
+
+
+## rule best_centrimo_experiment_logo
+
+- Input files not found: this may occur when the Experiment_TF ID contains certain characters as: *(*, *)*, *[*, *]*, *.*, */*, " "(one or more spaces). Before launching the pipeline, verify that none of the folders in your data folder contains such characters, the simplest option is remove them or substitute them by *-*. Note that this step was already implemented for the ChIP-atlas datasets.
