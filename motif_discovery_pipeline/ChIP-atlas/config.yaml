@@ -4,20 +4,26 @@ author: Jaime_A_Castro_Mondragon
 ###############################
 ## Expected folder structure ##
 ###############################
-
 ## The Snakefile will launch a motif analysis + calculate centrality for each discovered motifs for every set of peaks in Narrowpeak format found in the 'data_folder'.
 ##
 ## Example:
-## ls data_folder
 ##
-## 
+## cd data_folder
+##
+## .
+## ├── ERX032305_S2_Lint-1
+## │   └── ERX032305_S2_Lint-1_peaks.narrowPeak
+## └── ERX032306_Kc_Lint-1
+##     └── ERX032306_Kc_Lint-1_peaks.narrowPeak
+##
+## Every EXPERIMENT_FOLDER in the data folder must contain a narrowPeak file with the same name, see tree above.
+## This is the data structure required by the pipeline.
 
 
 ## === ##
 ## Bin ##
 ## === ##
 bin : ../bin
-bin_jaspar_2020 : /storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/bin
 python : python2.7
 RSAT : /lsc/rsat
 
