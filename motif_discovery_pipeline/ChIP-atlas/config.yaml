@@ -12,40 +12,56 @@ author: Jaime_A_Castro_Mondragon
 ##
 ## 
 
-## ======================== ##
-## Paths to scripts + data  ##
-## ======================== ##
-data_folder : /storage/scratch/JASPAR_2020/ChIP-atlas/ce10/data
+
+## === ##
+## Bin ##
+## === ##
 bin : ../bin
 bin_jaspar_2020 : /storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/bin
 python : python2.7
 RSAT : /lsc/rsat
 
 
-## ============= ##
-##  Genome files ##
-## ============= ##
-genome_fasta : /storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/ChIP-atlas/genomes/ce10.fa
-genome_size : /storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/ChIP-atlas/genomes/ce10.chrom.sizes
-
-
-## ============================= ##
-## TF - JASPAR association table ##
-## ============================= ##
-TF_Experiment_map : /storage/scratch/JASPAR_2020/ChIP-atlas/ce10/experiment_table/experimentList_TFs_and_others.tab
-
-
-## ================== ##
-## Output directories ##
-## ================== ##
-out_dir : ChIP-atlas_results/ce10
-
-
-## ======================================== ##
-## Motif discovery (peak-motifs) parameters ##
-## ======================================== ##
+## ============================================= ##
+## Motif discovery (RSAT peak-motifs) parameters ##
+## ============================================= ##
 peakmotifs_disco : oligos,dyads,positions,local_words
 peakmotifs_disco_nb_motifs : 2
 peakmotifs_disco_min_oligo : 6
 peakmotifs_disco_max_oligo : 7
 peakmotifs_class_interval : 25
+
+
+## ====================================== ##
+## ce10: folders and required input files ##
+## ====================================== ##
+data_folder : /storage/scratch/JASPAR_2020/ChIP-atlas/ce10/data
+genome_fasta : /storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/ChIP-atlas/genomes/ce10/ce10.fa
+genome_size : /storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/ChIP-atlas/genomes/ce10/ce10.chrom.sizes
+TF_Experiment_map : /storage/scratch/JASPAR_2020/ChIP-atlas/ce10/experiment_table/experimentList_TFs_and_others.tab
+out_dir : ChIP-atlas_results/ce10
+
+
+## ===================================== ##
+## dm3: folders and required input files ##
+## ===================================== ##
+# data_folder : /storage/scratch/JASPAR_2020/ChIP-atlas/dm3/data
+# genome_fasta : /storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/ChIP-atlas/genomes/dm3/dm3.fa
+# genome_size : /storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/ChIP-atlas/genomes/dm3/dm3.chrom.sizes
+# TF_Experiment_map : /storage/scratch/JASPAR_2020/ChIP-atlas/dm3/experiment_table/experimentList_TFs_and_others.tab
+# out_dir : ChIP-atlas_results/dm3
+
+
+## ========================================= ##
+## sacCer3: folders and required input files ##
+## ========================================= ##
+# data_folder : /storage/scratch/JASPAR_2020/ChIP-atlas/sacCer3/data
+# genome_fasta : /storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/ChIP-atlas/genomes/sacCer3/sacCer3.fa
+# genome_size : /storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/ChIP-atlas/genomes/sacCer3/sacCer3.chrom.sizes
+# TF_Experiment_map : /storage/scratch/JASPAR_2020/ChIP-atlas/sacCer3/experiment_table/experimentList_TFs_and_others.tab
+# out_dir : ChIP-atlas_results/sacCer3
+
+
+
+
+
