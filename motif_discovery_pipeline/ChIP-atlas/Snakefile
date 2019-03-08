@@ -7,9 +7,10 @@ from snakemake.utils import R
 configfile: "config.yaml"
 
 
-################################################################
-## Define variables
-            
+##########################
+## Initialize variables ##
+##########################
+
 ## Transcription Factor names
 (FOLDERS, ENCODE_TFs) = glob_wildcards(os.path.join(config["data_folder"], "{Folders}", "{TF}_peaks.narrowPeak"))
 
@@ -18,6 +19,7 @@ configfile: "config.yaml"
 
 ## TF names with number of discovered motifs
 ## Use this to avoid the use of dynamic files
+## NOTE 1: this is the folder structure required to execute the rules in Step 2. This structure is automatically produced by the rules launched to produce the files in the step 1.
 (F, TFs, NB) = glob_wildcards(os.path.join(config["out_dir"], "{F}", "motifs", "jaspar", "pfm", "{TF}_peak-motifs_m{NB}.jaspar"))
 
 
@@ -29,8 +31,9 @@ PEAK_EXTENSIONS =  {
 }
 
 
-################################################################
-## Output files
+##################
+## Output files ##
+##################
 
 ## Peak summit bed
 PEAK_SUMMIT_BED = expand(os.path.join(config["out_dir"], "{TF}", "peak_summits", "{TF}_peak_summits.bed"), TF = ENCODE_TFs)
@@ -57,9 +60,11 @@ MOTIF_RSAT_SITES_BED = expand(os.path.join(config["out_dir"], "{TF}", "matrix_si
 MOTIF_RSAT_SITES_FASTA = expand(os.path.join(config["out_dir"], "{TF}", "matrix_sites", "{TF}_peak-motifs_m{n}.tf.sites.fasta"), zip, TF = TFs, n = NB)
 
 
-
+## PWMs
 PWM_JASPAR = expand(os.path.join(config["out_dir"], "{TF}", "motifs", "jaspar", "pwm", "{TF}_peak-motifs_m{n}.jaspar.pssm"), zip, TF = TFs, n = NB)
 
+
+## Logos
 JASPAR_LOGOS = expand(os.path.join(config["out_dir"], "{TF}", "motifs", "jaspar", "logos", "{TF}_peak-motifs_m{n}_logo.png"), zip, TF = TFs, n = NB)
 
 
@@ -78,16 +83,21 @@ MOST_ENRICHED_MOTIF_ASSOC_LOGO = expand(os.path.join(config["out_dir"], "{TF}", 
 ################################################################
 ## Rules
 rule all:
+           #############################
+           ## Step 1: motif discovery ##
+           #############################
     input: PEAK_SUMMIT_BED, \
            EXTENDED_PEAKS_BED, \
            PEAKS_FASTA, \
            MOTIFS_RSAT_TF, \
            MOTIFS_RSAT_JASPAR, \
-           
            MOTIF_RSAT_SITES, \
            MOTIF_RSAT_SITES_BED, \
            MOTIF_RSAT_SITES_FASTA, \
-           
+
+           ########################
+           ## Step 2: centrality ##
+           ########################
            PWM_JASPAR, \
            JASPAR_LOGOS, \
            PWM_SCAN, \
@@ -105,6 +115,8 @@ rule all:
 rule extract_ENCODE_peak_summits:
     """ 
     Extract peak summits: chromosome, start, end
+
+    In the awk code, the column 10 corresponds to the shift where the peak summit is located, relative to the peak start.
     """
     input:
         os.path.join(config["data_folder"], "{TF}", "{TF}_peaks.narrowPeak")
@@ -150,7 +162,7 @@ rule get_fasta_ENCODE_peak_files:
     output:
         os.path.join(config["out_dir"], "{TF}", "fasta", "{TF}.{length}bp.fa")
     message:
-        "; Retrieven FASTA sequences from extended peaks - TF : {wildcards.TF} - Length: {wildcards.length}"
+        "; Retrieving FASTA sequences from extended peaks - TF : {wildcards.TF} - Length: {wildcards.length}"
     params:
         genome = config["genome_fasta"]
     priority:
@@ -164,16 +176,11 @@ rule get_fasta_ENCODE_peak_files:
 ###################
 ## RSAT analysis ##
 ###################
-
-## Notes about this rule:
-##
-## 1) The program local-word-analysis is written in python and called within peak-motifs. Given that the default python environment is 3.5, local-word-analysis will not run, therefore the solution is modify directly the line in the /lsc/rsat/perl-scripts/peak-motifs script adding "python2.7" before the program is called.
-##
-## 2) The default interval for position-analysis is 50nt, which is too large for the JASPAR pipeline (where the peaks have a size of 101), this produced non-relevant artifact motifs. By changing the interval to 20 (or 25) the program founds the expected TF motif.
-##
 rule RSAT_peakmotifs_per_exp:
     """ 
     Run RSAT peak-motifs (motif discovery with different algorithms) on every peakset.
+
+    The set of N discovered motifs is stored in a single transfac file.
     """
     input:
         os.path.join(config["out_dir"], "{TF}", "fasta", "{TF}.101bp.fa")
@@ -227,6 +234,8 @@ rule RSAT_peakmotifs_per_exp:
 rule RSAT_PSSM_to_JASPAR_format:
     """ 
     Convert the RSAT discovered matrices from transfac (tf) format to JASPAR format.
+
+    The transfac file is split in several files (one per motif) adding as suffix the motif number (e.g., 1,2,3,...).
     """
     input:
         os.path.join(config["out_dir"], "{TF}", "peak-motifs", "results", "discovered_motifs", "{TF}_motifs_discovered.tf")
@@ -261,15 +270,14 @@ rule RSAT_PSSM_to_JASPAR_format:
         """
 
 
-## NOTES about this rule:
-## 1) The 'motif_tab' input file name is used to chain the rule 'RSAT_PSSM_to_JASPAR_format' with 'JASPAR_PSSM_to_PWM'
+## NOTE 2: The 'motif_tab' input file name is used to chain the rule 'RSAT_PSSM_to_JASPAR_format' with 'JASPAR_PSSM_to_PWM'
 ##
-## 2) To avoid the use of dynamic files (not recommended by snakemake developers) we have to read all the created files from the 'RSAT_PSSM_to_JASPAR_format' and create the wildcards from these files: this will produce an array where every entry corresponds to one of these files.
-##
-## 3) Use the zip parameter to have a correct correspondency between the experiments (TF) and the number of discovered motif (the number may vary from 1-4 depending the experiment), if zip is not used will try to create all the combinations between TFs and number of motifs, since not all the TF produce the same number of motifs, the workflow will crash.
+## NOTE 3: Use the zip parameter to have a correct correspondency between the experiments (TF) and the number of the discovered motif (the number may vary depending the experiment), if zip is not used, snakemake will try to create all the combinations between TFs and number of motifs, since not all the TF produce the same number of motifs, the workflow will crash.
 rule JASPAR_PSSM_to_PWM:
     """ 
     Convert the JASPAR PSSMs in PWMs.
+
+    This rule is executed for each discovered motif.
     """
     input:
         motif_tab = os.path.join(config["out_dir"], "{TF}", "motifs", "jaspar", "pfm", "{TF}_matrix_list.tab"), \
@@ -311,7 +319,9 @@ rule JASPAR_PSSM_to_PWM:
 
 rule Generate_matrix_logo:
     """ 
-    Generate motif logos.
+    Generate motif logos using RSAT convert-matrix
+
+    This rule is executed for each discovered motif.
     """
     input:
         os.path.join(config["out_dir"], "{TF}", "motifs", "jaspar", "pfm", "{TF}_peak-motifs_m{n}.jaspar")
@@ -342,7 +352,9 @@ rule Generate_matrix_logo:
 #########################################
 rule find_RSAT_matrix_sites:
     """ 
-    Find the TFBSs used to built the RSAT matrices.
+    Find the TFBSs used to built the matrices.
+
+    This rule is executed for each discovered motif.
     """
     input:
         motif_tab = os.path.join(config["out_dir"], "{TF}", "motifs", "jaspar", "pfm", "{TF}_matrix_list.tab"), \
@@ -371,6 +383,8 @@ rule find_RSAT_matrix_sites:
 rule convert_RSAT_matrix_sites_to_BED:
     """ 
     Get the genomic coordinates (BED file) of the matrix sites.
+
+    This rule is executed for each discovered motif.
     """
     input:
         os.path.join(config["out_dir"], "{TF}", "matrix_sites", "{TF}_peak-motifs_m{n}.tf.sites")
@@ -391,6 +405,8 @@ rule convert_RSAT_matrix_sites_to_BED:
 rule get_RSAT_matrix_sites_fasta:
     """ 
     Get the fasta sequences from genomic coordinates (BED file) of the matrix sites.
+
+    This rule is executed for each discovered motif.
     """
     input:
         os.path.join(config["out_dir"], "{TF}", "matrix_sites", "{TF}_peak-motifs_m{n}.tf.sites.bed")
@@ -408,26 +424,14 @@ rule get_RSAT_matrix_sites_fasta:
         """
 
 
-# rm -rf encode/*/central_enrichment ; rm -rf encode/*/matrix_sites ; rm -rf encode/*/scan ; 
-
-# python /storage/mathelierarea/processed/anthoma/Projects/JASPAR2018/bin/compute_weblogo.py -j /storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/encode/ENCSR000BPX_A549_FOXA1/motifs/jaspar/pwm/ENCSR000BPX_A549_FOXA1_peak-motifs_m2.jaspar.pssm -o /storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/encode/ENCSR000BPX_A549_FOXA1/motifs/jaspar/logos/ENCSR000BPX_A549_FOXA1_peak-motifs_m2.png
-
-# /lsc/rsat/perl-scripts/convert-matrix -v 2 -i /storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/encode/ENCSR000BPX_A549_FOXA1/motifs/jaspar/pfm/ENCSR000BPX_A549_FOXA1_peak-motifs_m9.jaspar -from jaspar -to jaspar -return logo -logo_dir /storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/encode/ENCSR000BPX_A549_FOXA1/motifs/jaspar/logos -logo_file ENCSR000BPX_A549_FOXA1_peak-motifs_m9
-
-
-# /lsc/rsat/perl-scripts/convert-matrix -v 2 -from tf -to tab -i /storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/encode/ENCSR000BPX_A549_FOXA1/peak-motifs/results/discovered_motifs/ENCSR000BPX_A549_FOXA1_motifs_discovered.tf -return counts -split -prefix peak-motifs -o /storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/encode/ENCSR000BPX_A549_FOXA1/motifs/jaspar/pfm/ENCSR000BPX_A549_FOXA1
-
-# /lsc/rsat/bin/matrix-scan-quick -i /storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/encode/ENCSR000BPX_A549_FOXA1/peak-motifs/data/sequences/ENCSR000BPX_A549_FOXA1_test.fasta -m /storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/encode/ENCSR000BPX_A549_FOXA1/motifs/jaspar/pfm/ENCSR000BPX_A549_FOXA1_peak-motifs_m1.tab -bg_file /storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/encode/ENCSR000BPX_A549_FOXA1/peak-motifs/results/composition/ENCSR000BPX_A549_FOXA1_test_inclusive-1str-ovlp_2nt.txt -t 5 -return sites
-
-# awk -f /storage/mathelierarea/processed/anthoma/Projects/JASPAR2018/bin/sites-to-bed.awk /storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/encode/ENCSR000BPX_A549_FOXA1/matrix_sites/ENCSR000BPX_A549_FOXA1_peak-motifs_m10.tf.sites
-
-
 #########################################
 ## Matrix scan: extended peaks (501bp) ##
 #########################################
 rule Scan_JASPAR_PWM:
     """ 
     Scan the PWM in the extended peaks (501bp).
+
+    This rule is executed for each discovered motif.
     """
     input:
         pwm = os.path.join(config["out_dir"], "{TF}", "motifs", "jaspar", "pwm", "{TF}_peak-motifs_m{n}.jaspar.pssm"), \
@@ -446,28 +450,14 @@ rule Scan_JASPAR_PWM:
         """
 
 
-#######################
-## Centrimo analysis ##
-#######################
-# rule create_centrimo_folders:
-#     """ 
-#     Create central enrichment folder for each TF (experiment).
-#     """
-#     input:
-#         os.path.join(config["out_dir"], "{TF}")
-#     output:
-#         directory(os.path.join(config["out_dir"], "{TF}", "central_enrichment"))
-#     message:
-#         "; Creating central enrichment folders - TF : {wildcards.TF} "
-#     shell:
-#         """
-#         mkdir -p {output}
-#         """
-
-        
+###############################
+## Centrality test and plots ##
+###############################
 rule Calculate_centrimo_pvalue:
     """ 
     Calculate p-value for central enrichment.
+
+    This rule is executed for each discovered motif.
     """
     input:
         sites = os.path.join(config["out_dir"], "{TF}", "scan", "501bp", "{TF}_m{n}.501bp.fa"),
@@ -496,6 +486,8 @@ rule Calculate_centrimo_pvalue:
 rule generate_centrimo_plots:
     """ 
     Generate centrimo plots (local enrichment) around the peak summits.
+
+    This rule is executed for each discovered motif.
     """
     input:
         os.path.join(config["out_dir"], "{TF}", "scan", "501bp", "{TF}_m{n}.501bp.fa")
@@ -516,6 +508,8 @@ rule generate_centrimo_plots:
 rule choose_best_centrimo_experiment:
     """ 
     Select the motif with the best (lowest) centrimo p-value.
+
+    This rule is executed for each dataset (experiment).
     """
     input:
         os.path.join(config["out_dir"], "{TF}", "motifs", "jaspar", "pfm", "{TF}_matrix_list.tab")
@@ -534,9 +528,12 @@ rule choose_best_centrimo_experiment:
         """
 
 
+## NOTE 4: the awk variables are relative to the ChIP-atlas experiment table.
 rule annotate_best_centrimo_experiment:
     """ 
     Assing the TF name to the selected motif.
+
+    This rule is executed for the best experiment of each dataset (experiment).
     """
     input:
         tf_jaspar_map = config["TF_Experiment_map"],
@@ -559,12 +556,11 @@ rule annotate_best_centrimo_experiment:
         """
 
 
-# bash ../bin/create_latex_logos.sh -i ChIP-atlas/ChIP-atlas_results/ERX1270343_Unclassified_lir-3/central_enrichment/selected_motif/ERX1270343_Unclassified_lir-3.501bp.fa.sites.centrimo.best.TF_associated -o ChIP-atlas/ChIP-atlas_results/ERX1270343_Unclassified_lir-3/central_enrichment/selected_motif/ERX1270343_Unclassified_lir-3.501bp.fa.sites.centrimo.best.TF_associated.tex
-
-        
 rule best_centrimo_experiment_logo:
     """ 
-    
+    Export a PDF file with the motif logo, experiment, Tf name and centrality p-value.
+
+    This rule is executed for the best experiment of each dataset (experiment).
     """
     input:
         os.path.join(config["out_dir"], "{TF}", "central_enrichment", "selected_motif", "{TF}.501bp.fa.sites.centrimo.best.TF_associated")
@@ -580,23 +576,3 @@ rule best_centrimo_experiment_logo:
         """
         bash {params.scripts_bin}/create_latex_logos.sh -i '{input}' -o '{output}'
         """
-
-
-
-        
-
-#bash /storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/bin/create_latex_logos.sh -i /storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/encode/ENCSR000BPX_A549_FOXA1/central_enrichment/selected_motif/ENCSR000BPX_A549_FOXA1.501bp.fa.sites.centrimo.best.TF_associated -o /storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/encode/ENCSR000BPX_A549_FOXA1/central_enrichment/selected_motif/ENCSR000BPX_A549_FOXA1.501bp.fa.sites.centrimo.best.TF_associated.tex
-
-
-#bash /storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/bin/best_centrimo.sh -i /storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/encode/ENCS*_YY1/central_enrichment
-
-# motif="$(more /storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/encode/ENCSR000AUE_A549_CTCF/central_enrichment/selected_motif/ENCSR000AUE_A549_CTCF.501bp.fa.sites.centrimo.best | cut -f1 | xargs basename | cut -d'.' -f1)"; awk -v mot=$motif 'NR==FNR{mapping[$11] = $1} NR!=FNR{split($1, arr, "/"); split(arr[10], enc, "_"); print enc[1]"\t"enc[3]"\t"mapping[enc[1]]"\t"$0"\t"$motif}' /storage/mathelierarea/processed/anthoma/Projects/JASPAR2018/data/20170619_ReMap_TFs/TF_JASPAR_mapping.tsv /storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/encode/ENCSR000AUE_A549_CTCF/central_enrichment/selected_motif/ENCSR000AUE_A549_CTCF.501bp.fa.sites.centrimo.best
-
-
-#motif=$"(more /storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/encode/ENCSR000AUE_A549_CTCF/central_enrichment/selected_motif/ENCSR000AUE_A549_CTCF.501bp.fa.sites.centrimo.best | cut -f1 | xargs basename | cut -d'.' -f1)"
-
-
-#more /storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/encode/ENCSR000AUE_A549_CTCF/central_enrichment/selected_motif/ENCSR000AUE_A549_CTCF.501bp.fa.sites.centrimo.best | cut -f1 | xargs dirname | perl -lne '$_ =~ s/central_enrichment/motifs\/jaspar\/logos/gi; print $_'
-
-
-# /storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/encode/ENCSR000BPW_A549_EP300/motifs/jaspar/logos/ENCSR000BPW_A549_EP300_peak-motifs_m5_logo.png
