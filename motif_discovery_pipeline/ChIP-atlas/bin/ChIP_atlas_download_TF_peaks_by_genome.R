@@ -1,10 +1,9 @@
 #!/usr/bin/env Rscript
 
-
 ################
 ## How to run ##
 ################
-## Rscript --vanilla ChIP_atlas_download_TF_peaks_by_genome.R out_folder genome
+## Rscript ChIP_atlas_download_TF_peaks_by_genome.R out_folder genome
 
 #####################
 ## Load R packages ##
@@ -43,17 +42,15 @@ message("; Genome: ", genome)
 
 # out.folder <- "/storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/"
 # genome <- "ce10"
-
 # experiment.tab.file <- "/storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/ChIP-atlas/experiment_table/experimentList_TFs_and_others.tab"
 # ChIP.atlas.data.folder <- "/storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/ChIP-atlas/data"
-
 
 
 ##########################
 ## Create output folder ##
 ##########################
-ChIP.atlas.data.folder <- file.path(out.folder, "ChIP-atlas", "data")
-exp.tab.folder <- file.path(out.folder, "ChIP-atlas", "experiment_table")
+ChIP.atlas.data.folder <- file.path(out.folder, "ChIP-atlas", genome, "data")
+exp.tab.folder <- file.path(out.folder, "ChIP-atlas", genome, "experiment_table")
 
 
 message("; ")
@@ -67,24 +64,24 @@ exp.tab.file <- file.path(exp.tab.folder, "experimentList.tab")
 exp.tab.parsed.file <- file.path(exp.tab.folder, "experimentList_TFs_and_others.tab")
 
 
-## Only runs this section when the parsed experiment table does not exist
-if(!exists(exp.tab.parsed.file)){
- 
+# Only runs this section when the parsed experiment table does not exist
+if(!exists(exp.tab.file)){
+
   ###############################
   ## Download experiment table ##
   ###############################
   message("; Downloading experiment table")
   download.tab.cmd <- paste0("wget http://dbarchive.biosciencedbc.jp/kyushu-u/metadata/experimentList.tab -O ", exp.tab.file)
-  
+
   message("; ")
   message("; ", download.tab.cmd)
   system(download.tab.cmd)
-  
-  
+
+
   ################################
   ## Parse the experiment table ##
   ################################
-  
+
   ## NOTE: this is done via shell since the table cannot be loaded in R. Apparently many lines do not contain the same number of columns.
   ## Columns:
   ##
@@ -95,11 +92,11 @@ if(!exists(exp.tab.parsed.file)){
   ## 6) Cell type
   message("; Parsing experiment table")
   parse.tab.cmd <- paste0("more ", exp.tab.file, " | grep 'TFs and others'  | cut -f1,2,4,5,6 > ", exp.tab.parsed.file)
-  
+
   message("; ")
   message("; ", parse.tab.cmd)
   system(parse.tab.cmd)
-  
+
 }
 
 
@@ -121,35 +118,78 @@ experiment.tab <- experiment.tab[!experiment.tab$Protein %in% proteins.to.rm, ]
 # genomes <- "ce10"
 
 ## Set the number of cores to parallelize the loop
-sapply(genome, function(g){
+g <- genome
   
-  ## Select the entries with a given genome
-  experiment.tab.genome.parsed <- experiment.tab %>% 
-                                    filter(genome == g)
-  
-  ## Parse the cell type names
-  experiment.tab.genome.parsed$Cell_type <- as.vector(sapply(experiment.tab.genome.parsed$Cell_type, gsub, pattern = "\\s+", replacement = "-"))
+## Select the entries with a given genome
+experiment.tab.genome.parsed <- experiment.tab %>% 
+  filter(genome == g)
 
+## Select the entries with a given genome
+experiment.tab.genome.parsed <- experiment.tab %>% 
+  filter(genome == g)
+
+## Parse the cell type names
+experiment.tab.genome.parsed$Cell_type <- as.vector(sapply(experiment.tab.genome.parsed$Cell_type, gsub, pattern = "\\s+", replacement = "-"))
+
+
+## Generate download commands
+experiment.id.jaspar <- paste(experiment.tab.genome.parsed$Experiment_ID, 
+                              experiment.tab.genome.parsed$Cell_type,
+                              experiment.tab.genome.parsed$Protein,
+                              sep = "_")
+
+experiment.id.jaspar <- gsub(experiment.id.jaspar, pattern = "\\(", replacement = "")
+experiment.id.jaspar <- gsub(experiment.id.jaspar, pattern = "\\)", replacement = "")
+
+## Experiment JASPAR ID
+experiment.tab.genome.parsed$Experiment_ID_JASPAR <- experiment.id.jaspar
+
+## Remove: Epitope tag + BrdU entries
+experiment.tab.genome.parsed <- experiment.tab.genome.parsed[!grepl(experiment.tab.genome.parsed$Experiment_ID_JASPAR, pattern = "Epitope tag", ignore.case = TRUE),]
+experiment.tab.genome.parsed <- experiment.tab.genome.parsed[!grepl(experiment.tab.genome.parsed$Experiment_ID_JASPAR, pattern = "Epitope", ignore.case = TRUE),]
+experiment.tab.genome.parsed <- experiment.tab.genome.parsed[!grepl(experiment.tab.genome.parsed$Experiment_ID_JASPAR, pattern = "BrdU", ignore.case = TRUE),]
+
+
+## Set ChIP-atlas download file name
+experiment.tab.genome.parsed$File_download <- file.path(ChIP.atlas.data.folder, experiment.tab.genome.parsed$Experiment_ID_JASPAR, paste0(experiment.tab.genome.parsed$Experiment_ID_JASPAR, "_peaks.narrowPeak"))
+
+## Set ChIP-atlas URL
+experiment.tab.genome.parsed$URL <- paste0("http://dbarchive.biosciencedbc.jp/kyushu-u/", g, "/eachData/bed05/", experiment.tab.genome.parsed$Experiment_ID, ".05.bed")
+
+
+## Export table
+# write.table(experiment.tab.genome.parsed, file = "Experiment_table_parsed.tab", sep = "\t", row.names = FALSE, col.names = TRUE, quote = FALSE)
+
+
+## Parallel download
+plan(multiprocess, workers = 75)
+trash <- future_sapply(1:nrow(experiment.tab.genome.parsed), function(n){
   
-  ## Generate download commands
-  experiment.id.jaspar <- paste(experiment.tab.genome.parsed$Experiment_ID, 
-                                experiment.tab.genome.parsed$Cell_type,
-                                experiment.tab.genome.parsed$Protein,
-                                sep = "_")
+  ## Create folder before download
+  dir.create(file.path(ChIP.atlas.data.folder, experiment.tab.genome.parsed$Experiment_ID_JASPAR[n]), recursive = TRUE, showWarnings = FALSE)
+
+
+  file.url <- as.vector(experiment.tab.genome.parsed$URL[n])
+  downloaded.file <- as.vector(experiment.tab.genome.parsed$File_download[n])
   
-  ## Experiment JASPAR ID
-  experiment.tab.genome.parsed$Experiment_ID_JASPAR <- experiment.id.jaspar
-  
-  ## Set ChIP-atlas download file name
-  experiment.tab.genome.parsed$File_download <- file.path(ChIP.atlas.data.folder, experiment.tab.genome.parsed$Experiment_ID_JASPAR, paste0(experiment.tab.genome.parsed$Experiment_ID_JASPAR, "_peaks.narrowPeak "))
-  
-  ## Commands to create folder and download files
   message("; ")
-  message("; Downloading experiment: ", experiment.tab.genome.parsed$Experiment_ID)
-  experiment.tab.genome.parsed$Command_download <- paste0("mkdir -p ", file.path(ChIP.atlas.data.folder, experiment.tab.genome.parsed$Experiment_ID_JASPAR),
-                             "; wget http://dbarchive.biosciencedbc.jp/kyushu-u/", g, "/eachData/bed05/", experiment.tab.genome.parsed$Experiment_ID, ".05.bed -O ", experiment.tab.genome.parsed$File_download)
+  message("; ", downloaded.file)
+  ## Download command
+  ## NOTE: use this function rather than calling the system.
+  download.file(url = file.url,
+                destfile = downloaded.file, 
+                method = "wget",
+                quiet = TRUE)
 
-  plan(multiprocess, workers = 50)
-  # future_sapply(experiment.tab.genome.parsed$Command_download[1:15], system)
-  future_sapply(experiment.tab.genome.parsed$Command_download, system)
+
+  downloaded.file <- gsub(downloaded.file, pattern = "^\\.\\/", replacement = "")
+  downloaded.file <- as.character(file.path(getwd(),downloaded.file))
+  
+  ## Check the file size of the downloaded file
+  ## Delete the file and its folder when the file is empty
+  if(file.size(downloaded.file) == 0){
+    file.remove(downloaded.file)
+    unlink(dirname(downloaded.file), recursive = TRUE)
+    message("; Removed file: ", downloaded.file)
+  }
 })
