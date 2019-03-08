@@ -109,7 +109,12 @@ cd data_folder
     └── ERX032306_Kc_Lint-1_peaks.narrowPeak
 ```
 
-Every EXPERIMENT_FOLDER in the data folder must contain a narrowPeak file with the same name, see tree above.
+Every EXPERIMENT_FOLDER in the data folder must contain a narrowPeak file with the same name and the suffix *_peaks*, see tree above.
+Example:
+```
+EXPERIMENT_FOLDER = ERX032305_S2_Lint-1
+narrowPeak        = ERX032305_S2_Lint-1_peaks.narrowPeak
+```
 This is the data structure required by the pipeline.
 
 
