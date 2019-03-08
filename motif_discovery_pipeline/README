@@ -107,7 +107,7 @@ snakemake [--cores X]
 ## Troubleshooting
 
 
-## rule RSAT_peakmotifs_per_exp
+### rule RSAT_peakmotifs_per_exp
 
 - *RSAT peak-motifs* none motif found: verify that the input *NarrowPeak* is not empty. In the case of ChUP-atlas, many of the downloaded files are empty, to avoid this error, remove these files before launching the pipeline.
 
@@ -116,11 +116,11 @@ snakemake [--cores X]
 - *RSAT position-analysis* founds highly repetitive/uninformative motifs: The default interval for position-analysis is 50nt, which is too large for the JASPAR pipeline (where the peaks have a size of 101), this may produce non-relevant artifact motifs. By changing the interval to 25 the program may found the expected TF motif. Note that this change was already set in the config file.
 
 
-## rule annotate_best_centrimo_experiment
+### rule annotate_best_centrimo_experiment
 
 - Verify that the variables in the *awk* command correspond to the correct fields in your experiment table. The current *awk* variables in the rule are specific for the ChIP-atlas experiment table.
 
 
-## rule best_centrimo_experiment_logo
+### rule best_centrimo_experiment_logo
 
 - Input files not found: this may occur when the Experiment_TF ID contains certain characters as: *(*, *)*, *[*, *]*, *.*, */*, " "(one or more spaces). Before launching the pipeline, verify that none of the folders in your data folder contains such characters, the simplest option is remove them or substitute them by *-*. Note that this step was already implemented for the ChIP-atlas datasets.
