@@ -76,6 +76,7 @@ Set the following variables in the config file:
 ### Software variables
 
 Assuming that you are in the *motif_discovery_pipeline/ChIP-atlas* folder:
+
 - *bin* : ../bin 
 - *python* : python2.7 
 - *RSAT* : /lsc/rsat
