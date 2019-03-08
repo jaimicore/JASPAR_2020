@@ -99,7 +99,7 @@ You can see where RSAT program are using the following command: ```echo $RSAT```
 The Snakefile will launch a motif analysis + centrality enrichment test for each discovered motif of each dataset (experiment). To launch the pipeline we only required a *narrowPeak* file that must be located in the 'data_folder'specified in the config file (see *configuration file* section).
 
 Example:
-
+```
 cd data_folder
 
 .
@@ -107,6 +107,7 @@ cd data_folder
 │   └── ERX032305_S2_Lint-1_peaks.narrowPeak
 └── ERX032306_Kc_Lint-1
     └── ERX032306_Kc_Lint-1_peaks.narrowPeak
+```
 
 Every EXPERIMENT_FOLDER in the data folder must contain a narrowPeak file with the same name, see tree above.
 This is the data structure required by the pipeline.
@@ -154,3 +155,8 @@ snakemake [--cores X]
 ### rule best_centrimo_experiment_logo
 
 - Input files not found: this may occur when the Experiment_TF ID contains certain characters as: *(*, *)*, *[*, *]*, *.*, */*, " "(one or more spaces). Before launching the pipeline, verify that none of the folders in your data folder contains such characters, the simplest option is remove them or substitute them by '*-*'. Note that this step was already implemented for the ChIP-atlas datasets.
+
+
+## Memory requirements
+
+If you launch the *Snakifile* using multiple cores (See *Launching the *snakemake* workflow* section), each core will use ~1GB of memory in your computer.
