@@ -140,6 +140,7 @@ experiment.id.jaspar <- paste(experiment.tab.genome.parsed$Experiment_ID,
 
 experiment.id.jaspar <- gsub(experiment.id.jaspar, pattern = "\\(", replacement = "")
 experiment.id.jaspar <- gsub(experiment.id.jaspar, pattern = "\\)", replacement = "")
+experiment.id.jaspar <- gsub(experiment.id.jaspar, pattern = "\\.", replacement = "-")
 
 ## Experiment JASPAR ID
 experiment.tab.genome.parsed$Experiment_ID_JASPAR <- experiment.id.jaspar
