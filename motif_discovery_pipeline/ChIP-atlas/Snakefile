@@ -598,7 +598,10 @@ rule Concat_annotated_experiments:
         84
     shell:
         """
-        cat {input} > {output}
+        rm -rf {output} ;  
+        FILE_LIST=`ls {input}` ;
+        touch {output} ; 
+        for f in $FILE_LIST ; do cat $f >> {output} ; done;
         """
 
 
@@ -622,3 +625,10 @@ rule Select_motifs_to_curate:
         cat {input} | awk '{{ if ($5 <= {params.central_pval}) {{ print }} }}' | uniq > {output}
         """
         
+
+
+
+#ChIP-atlas_results/sacCer3/SRX3433196_BY4741_GCN4/central_enrichment/selected_motif/SRX3433196_BY4741_GCN4.501bp.fa.sites.centrimo.best.TF_associated ChIP-atlas_results/sacCer3/SRX3433196_BY4741_GCN4/central_enrichment/selected_motif/SRX3433196_BY4741_GCN4.501bp.fa.sites.centrimo.best.TF_associated ChIP-atlas_results/sacCer3/SRX3433196_BY4741_GCN4/central_enrichment/selected_motif/SRX3433196_BY4741_GCN4.501bp.fa.sites.centrimo.best.TF_associated ChIP-atlas_results/sacCer3/SRX3433196_BY4741_GCN4/central_enrichment/selected_motif/SRX3433196_BY4741_GCN4.501bp.fa.sites.centrimo.best.TF_associated
+
+
+# TEST=`ls ChIP-atlas_results/sacCer3/SRX3433196_BY4741_GCN4/central_enrichment/selected_motif/SRX3433196_BY4741_GCN4.501bp.fa.sites.centrimo.best.TF_associated ChIP-atlas_results/sacCer3/SRX3433196_BY4741_GCN4/central_enrichment/selected_motif/SRX3433196_BY4741_GCN4.501bp.fa.sites.centrimo.best.TF_associated ChIP-atlas_results/sacCer3/SRX3433196_BY4741_GCN4/central_enrichment/selected_motif/SRX3433196_BY4741_GCN4.501bp.fa.sites.centrimo.best.TF_associated ChIP-atlas_results/sacCer3/SRX3433196_BY4741_GCN4/central_enrichment/selected_motif/SRX3433196_BY4741_GCN4.501bp.fa.sites.centrimo.best.TF_associated`
