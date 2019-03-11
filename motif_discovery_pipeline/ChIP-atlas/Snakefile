@@ -80,6 +80,10 @@ MOST_ENRICHED_MOTIF_ASSOC = expand(os.path.join(config["out_dir"], "{TF}", "cent
 MOST_ENRICHED_MOTIF_ASSOC_LOGO = expand(os.path.join(config["out_dir"], "{TF}", "central_enrichment", "selected_motif", "{TF}.501bp.fa.sites.centrimo.best.TF_associated.tex"), TF = TFs, n = NB)
 
 
+## Selected motifs to curate
+MOTIFS_TO_CURATE = os.path.join(config["curation_dir"], "Selected_motifs_to_curate_log10_pval_-200.tab")
+
+
 ################################################################
 ## Rules
 rule all:
@@ -106,6 +110,7 @@ rule all:
            CENTRIMO_BEST, \
            MOST_ENRICHED_MOTIF_ASSOC, \
            MOST_ENRICHED_MOTIF_ASSOC_LOGO, \
+           MOTIFS_TO_CURATE, \
 
 
 
@@ -576,3 +581,44 @@ rule best_centrimo_experiment_logo:
         """
         bash {params.scripts_bin}/create_latex_logos.sh -i '{input}' -o '{output}'
         """
+
+
+rule Concat_annotated_experiments:
+    """ 
+    Concatenate the tables with the annotated experiments and the centrality p-value
+
+    """
+    input:
+        MOST_ENRICHED_MOTIF_ASSOC
+    output:
+        os.path.join(config["curation_dir"], "Annotated_experiments_cat.tab")
+    message:
+        "; Concatenating the tables with the annotated experiments and the centrality p-value "
+    priority:
+        84
+    shell:
+        """
+        cat {input} > {output}
+        """
+
+
+rule Select_motifs_to_curate:
+    """ 
+    Select those motifs satisfying the centrality p-value threshold.
+
+    """
+    input:
+        os.path.join(config["curation_dir"], "Annotated_experiments_cat.tab")
+    output:
+        os.path.join(config["curation_dir"], "Selected_motifs_to_curate_log10_pval_-200.tab")
+    message:
+        "; Selecting motifs to curate - Centrality p-value: {{config['central_pvalue']}} "
+    params:
+        central_pval = config["central_pvalue"]
+    priority:
+        83
+    shell:
+        """
+        cat {input} | awk '{{ if ($5 <= {params.central_pval}) {{ print }} }}' | uniq > {output}
+        """
+        
