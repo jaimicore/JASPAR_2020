@@ -594,16 +594,14 @@ rule Concat_annotated_experiments:
         os.path.join(config["curation_dir"], "Annotated_experiments_cat.tab")
     message:
         "; Concatenating the tables with the annotated experiments and the centrality p-value "
+    params: out_dir = config["out_dir"]
     priority:
         84
     shell:
         """
-        rm -rf {output} ;  
-        FILE_LIST=`ls {input}` ;
-        touch {output} ; 
-        for f in $FILE_LIST ; do cat $f >> {output} ; done;
+        ls {params.out_dir}/*/central_enrichment/selected_motif/*.501bp.fa.sites.centrimo.best.TF_associated | xargs cat > {output}  
         """
-
+    
 
 rule Select_motifs_to_curate:
     """ 
