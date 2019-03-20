@@ -1,0 +1,11 @@
+
+# Project-specific
+.Rhistory
+
+# Mac
+*.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+

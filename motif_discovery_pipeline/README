@@ -1,11 +1,17 @@
 # JASPAR 2020
 
-Depending on the ChIP-seq data repository (e.g., ChIP-atlas or ENCODE) the pipeline may slightly vary. For this reason there is a folder for each repository with its respective Snakefile and Config file.
+Depending on the ChIP-seq data repository (e.g., ChIP-atlas or ENCODE) the pipeline may vary slightly. For this reason there is a folder for each repository with its respective Snakefile and Config file.
 
 This folder is divided in 2 subfolders:
 
 - bin       : with all the executable files called in the workflow.
-- CHIP-atlas: contains all the analysis performed in ChIP-atlas datasets + Snakefile + Config file
+- ChIP-atlas: contains all the analysis performed in ChIP-atlas datasets + Snakefile + Config file
+- ModERN: contains the files for processing the ModERN worm and fly datasets described in http://www.genetics.org/content/208/3/937
+
+
+## Contributors
+Author: Jaime A Castro-Mondragon
+Contributors: Robin van der Lee
 
 
 ## Dependencies.
@@ -14,16 +20,17 @@ The following software and R libraries must be installed in order to run the com
 
 - *R*
 	- data.table
-  	- dplyr
-  	- future.apply
-  	- reshape2
+  - dplyr
+  - future.apply
+  - reshape2
+```install.packages("data.table"); install.packages("dplyr"); install.packages("future.apply"); install.packages("reshape2")```
 
 - *RSAT* (Regulatory Sequences analysis Tools) software: http://rsat-tagc.univ-mrs.fr/rsat/
+- Perl TFBS modules: http://tfbs.genereg.net/
 - *snakemake*: https://snakemake.readthedocs.io/en/stable/index.html
 
 
 ## Download ChIP-seq datasets from ChIP-atlas
-
 
 1. Change the directory:
 ```
@@ -69,9 +76,37 @@ Rscript bin/ChIP_atlas_download_TF_peaks_by_genome.R . sacCer3  ## S Cereviseae
 7. twoBitToFa information: http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/
 
 
+```
+wget http://hgdownload.cse.ucsc.edu/goldenPath/sacCer3/bigZips/sacCer3.chrom.sizes
+wget http://hgdownload.cse.ucsc.edu/goldenPath/sacCer3/bigZips/sacCer3.2bit
+wget http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/twoBitToFa 
+chmod +x twoBitToFa
+./twoBitToFa sacCer3.2bit sacCer3.fa
+```
+
+### Genomes for the ModERN data 
+```
+http://hgdownload.cse.ucsc.edu/goldenPath/dm6/bigZips/
+wget http://hgdownload.cse.ucsc.edu/goldenPath/dm6/bigZips/dm6.chrom.sizes
+wget http://hgdownload.cse.ucsc.edu/goldenPath/dm6/bigZips/dm6.2bit
+./twoBitToFa dm6.2bit dm6.fa
+```
+
+```
+wget ftp://ftp.wormbase.org/pub/wormbase/species/c_elegans/sequence/genomic/c_elegans.PRJNA13758.WS245.genomic.fa.gz
+gunzip c_elegans.PRJNA13758.WS245.genomic.fa.gz 
+
+# https://www.biostars.org/p/173963/ =>  pip install pyfaidx
+faidx c_elegans.PRJNA13758.WS245.genomic.fa -i chromsizes > c_elegans.PRJNA13758.WS245.genomic.chrom.sizes
+
+bash convert_chrlabels_c_elegans.sh 
+```
+
+
 ## Configuration file
 
 Set the following variables in the config file:
+
 
 ### Software variables
 
@@ -165,4 +200,4 @@ snakemake [--cores X]
 
 ## Memory requirements
 
-If you launch the *Snakifile* using multiple cores (See *Launching the *snakemake* workflow* section), each core will use ~1GB of memory in your computer.
+If you launch the *Snakefile* using multiple cores (See *Launching the *snakemake* workflow* section), each core will use ~1GB of memory in your computer.
