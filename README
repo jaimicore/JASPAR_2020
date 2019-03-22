@@ -10,8 +10,8 @@ This folder is divided in 2 subfolders:
 
 
 ## Contributors
-Author: Jaime A Castro-Mondragon
-Contributors: Robin van der Lee
+Author: Jaime A Castro-Mondragon  
+Contributors: Robin van der Lee  
 
 
 ## Dependencies.
@@ -20,10 +20,10 @@ The following software and R libraries must be installed in order to run the com
 
 - *R*
 	- data.table
-  - dplyr
-  - future.apply
-  - reshape2
-```install.packages("data.table"); install.packages("dplyr"); install.packages("future.apply"); install.packages("reshape2")```
+	- dplyr
+	- future.apply
+	- reshape2
+```install.packages("data.table"); install.packages("dplyr"); install.packages("future.apply"); install.packages("reshape2")```  
 
 - *RSAT* (Regulatory Sequences analysis Tools) software: http://rsat-tagc.univ-mrs.fr/rsat/
 - Perl TFBS modules: http://tfbs.genereg.net/
@@ -84,7 +84,7 @@ chmod +x twoBitToFa
 ./twoBitToFa sacCer3.2bit sacCer3.fa
 ```
 
-### Genomes for the ModERN data 
+#### Genomes for the ModERN data 
 ```
 http://hgdownload.cse.ucsc.edu/goldenPath/dm6/bigZips/
 wget http://hgdownload.cse.ucsc.edu/goldenPath/dm6/bigZips/dm6.chrom.sizes
