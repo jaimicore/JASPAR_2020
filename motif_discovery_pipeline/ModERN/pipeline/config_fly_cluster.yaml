@@ -1,4 +1,4 @@
-################################################################
+###############################################################
 author: Jaime_A_Castro_Mondragon
 author2: Robin_van_der_Lee
 
@@ -41,13 +41,13 @@ peakmotifs_class_interval : 25
 central_pvalue : -200
 
 
-## ============================================= ##
-## ModERN worm: folders and required input files ##
-## ============================================= ##
-data_folder : /home/rvdlee/JASPAR/ModERN/data/ModERN_worm_peaks_DATA
-TF_Experiment_map : /home/rvdlee/JASPAR/ModERN/data/ModERN_worm_experimentList_TFs_and_others.tab
-genome_fasta : /home/rvdlee/GENOMES/c_elegans.PRJNA13758.WS245.genomic.chrlabels.fa
-genome_size : /home/rvdlee/GENOMES/c_elegans.PRJNA13758.WS245.genomic.chrlabels.chrom.sizes
-out_dir : /home/rvdlee/JASPAR/ModERN/results_cluster/ModERN_worm/output
-curation_dir : /home/rvdlee/JASPAR/ModERN/results_cluster/ModERN_worm/curation
+## ============================================ ##
+## ModERN fly: folders and required input files ##
+## ============================================ ##
+data_folder : /home/rvdlee/JASPAR/ModERN/data/ModERN_fly_peaks_DATA
+TF_Experiment_map : /home/rvdlee/JASPAR/ModERN/data/ModERN_fly_peaks_experiment_map.txt
+genome_fasta : /home/rvdlee/GENOMES/dm6.fa 
+genome_size : /home/rvdlee/GENOMES/dm6.chrom.sizes
+out_dir : /home/rvdlee/JASPAR/ModERN/results_cluster/ModERN_fly/output
+curation_dir : /home/rvdlee/JASPAR/ModERN/results_cluster/ModERN_fly/curation
 
