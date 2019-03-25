@@ -533,12 +533,40 @@ rule choose_best_centrimo_experiment:
         """
 
 
+### DEPRECATED, NEW VERSION BELOW
+# ## NOTE 4: the awk variables are relative to the ChIP-atlas experiment table.
+# rule annotate_best_centrimo_experiment:
+#     """
+#     Assign the TF name to the selected motif.
+
+#     This rule is executed for the best experiment of each dataset (experiment).
+#     """
+#     input:
+#         tf_jaspar_map = config["TF_Experiment_map"],
+#         best_exp = os.path.join(config["out_dir"], "{TF}", "central_enrichment", "selected_motif", "{TF}.501bp.fa.sites.centrimo.best")
+#     output:
+#         os.path.join(config["out_dir"], "{TF}", "central_enrichment", "selected_motif", "{TF}.501bp.fa.sites.centrimo.best.TF_associated")
+#     message:
+#         "; Assigning TF name to the experiment: {wildcards.TF} "
+#     priority:
+#         86
+#     shell:
+#         """
+#         motif_name="$(more {input.best_exp} | cut -f1 | xargs basename | cut -d'.' -f1 | perl -lne '$_ =~ s/_m(\\d+)$/_peak-motifs_m$1/g; print $_ ')";
+
+#         motif_folder="$(more {input.best_exp} | cut -f1 | xargs dirname | perl -lne '$_ =~ s/central_enrichment/motifs\/jaspar\/logos/gi; print $_')";
+
+#         ##  -v: Pass variable as arguments
+#         ##
+#         awk -v motif_n=$motif_name -v motif_f=$motif_folder 'NR==FNR{{mapping[$11] = $1}} NR!=FNR{{split($1, arr, "/"); split(arr[3], enc, "_"); print enc[1]"\\t"enc[3]"\\t"enc[3]"\\t"$0"\\t"motif_f"/"motif_n"_logo.png"}}' {input.tf_jaspar_map} {input.best_exp} > {output}
+#         """
 ## NOTE 4: the awk variables are relative to the ChIP-atlas experiment table.
+
 rule annotate_best_centrimo_experiment:
     """
-    Assing the TF name to the selected motif.
+    Assign the TF name to the selected motif.
 
-    This rule is executed for the best experiment of each dataset (experiment).
+    This rule is executed for the best experiment of each dataset (experiment). Make sure the experiment map has the experiment ID in the first field, and the TF name in the third field
     """
     input:
         tf_jaspar_map = config["TF_Experiment_map"],
@@ -551,13 +579,7 @@ rule annotate_best_centrimo_experiment:
         86
     shell:
         """
-        motif_name="$(more {input.best_exp} | cut -f1 | xargs basename | cut -d'.' -f1 | perl -lne '$_ =~ s/_m(\\d+)$/_peak-motifs_m$1/g; print $_ ')";
-
-        motif_folder="$(more {input.best_exp} | cut -f1 | xargs dirname | perl -lne '$_ =~ s/central_enrichment/motifs\/jaspar\/logos/gi; print $_')";
-
-        ##  -v: Pass variable as arguments
-        ##
-        awk -v motif_n=$motif_name -v motif_f=$motif_folder 'NR==FNR{{mapping[$11] = $1}} NR!=FNR{{split($1, arr, "/"); split(arr[3], enc, "_"); print enc[1]"\\t"enc[3]"\\t"enc[3]"\\t"$0"\\t"motif_f"/"motif_n"_logo.png"}}' {input.tf_jaspar_map} {input.best_exp} > {output}
+        perl {params.scripts_bin}/annotate_best_centrimo_experiment.pl --best {input.best_exp} --map {input.tf_jaspar_map} --output {output}
         """
 
 
