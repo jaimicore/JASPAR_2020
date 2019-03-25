@@ -575,6 +575,8 @@ rule annotate_best_centrimo_experiment:
         os.path.join(config["out_dir"], "{TF}", "central_enrichment", "selected_motif", "{TF}.501bp.fa.sites.centrimo.best.TF_associated")
     message:
         "; Assigning TF name to the experiment: {wildcards.TF} "
+    params:
+        scripts_bin = config["bin"]
     priority:
         86
     shell:
