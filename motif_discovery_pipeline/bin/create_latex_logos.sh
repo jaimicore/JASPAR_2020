@@ -6,11 +6,11 @@
 
 usage="""
 \n
-$0 -i <input file> -o <output file>
+$0 -l <latex header file> -i <input file> -o <output file>
 \n
 """;
 
-TEMP=`getopt -o ho:i: -- "$@"`;
+TEMP=`getopt -o ho:i:l: -- "$@"`;
 if [ $? != 0 ]
 then
   echo "Terminating..." >&2;
@@ -20,11 +20,13 @@ eval set -- "$TEMP";
 
 input="NA";
 output="NA";
+latexheader="NA";
 while true
 do
   case "$1" in
     -i) input=$2; shift 2;;
     -o) output=$2; shift 2;;
+    -l) latexheader=$2; shift 2;;
     -h) echo -e $usage; exit;;
     --) shift; break;;
     *) echo "Internal error!"; exit 1;;
@@ -39,15 +41,24 @@ then
     exit 1;
 fi;
 
-BIN=/storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/jaspar_2020/motif_discovery_pipeline/bin
-cat $BIN/latex_header.txt > $output;
+if [ ! -e $latexheader ]
+then
+    echo -e "\nPlease provide the latex header file\n";
+    exit 1;
+fi;
+
+#BIN=/storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/jaspar_2020/motif_discovery_pipeline/bin
+#cat $BIN/latex_header.txt > $output;
+#latexheader="/home/rvdlee/JASPAR/jaimicore-jaspar_2020-a8db6feb9e0e/motif_discovery_pipeline/bin/latex_header.txt";
+cat $latexheader > $output;
+
 sort -k3,3 -k5,5n $input | \
 #more $input | \
 while read line
 do
     tfname=$(echo $line | cut -d ' ' -f 3 | tr '_' '-');
     #tfname=$(echo $line | cut -f3 | tr '_' '-');
-    exp_ID=$(echo $line | cut -d ' ' -f 1);
+    exp_ID=$(echo $line | cut -d ' ' -f 1 | tr '_' '-');
     #exp_ID=$(echo $line | cut -f1);
     centrimo_file=$(echo $line | cut -d ' ' -f 4);
     #centrimo_file=$(echo $line | cut -f4);
@@ -63,7 +74,7 @@ do
     echo "\\section*{$tfname}";
     echo "\\section*{$exp_ID}";
     echo "Centrimo p-value = $centrimo_pval \\\\";
-	#echo "Motif logo = $motif_logo \\\\";
+    #echo "Motif logo = $motif_logo \\\\";
         # pwmdir=$(dirname $centrimo_file);
         # echo -n "\\path{$pwmdir} \\\\";
         # pwmname=$(basename $centrimo_file .pssm.501bp.fa.sites.centrimo);

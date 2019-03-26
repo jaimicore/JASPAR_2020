@@ -1,5 +1,5 @@
 ################################################################
-## Import functions 
+## Import functions
 import os
 import itertools
 import subprocess
@@ -118,7 +118,7 @@ rule all:
 ## ENCODE datasets ##
 #####################
 rule extract_ENCODE_peak_summits:
-    """ 
+    """
     Extract peak summits: chromosome, start, end
 
     In the awk code, the column 10 corresponds to the shift where the peak summit is located, relative to the peak start.
@@ -138,7 +138,7 @@ rule extract_ENCODE_peak_summits:
 
 
 rule extend_ENCODE_peak_files:
-    """ 
+    """
     Extend the peak summits to both sides.
     """
     input:
@@ -159,7 +159,7 @@ rule extend_ENCODE_peak_files:
 
 
 rule get_fasta_ENCODE_peak_files:
-    """ 
+    """
     Get the fasta sequences for the extended peaks
     """
     input:
@@ -182,7 +182,7 @@ rule get_fasta_ENCODE_peak_files:
 ## RSAT analysis ##
 ###################
 rule RSAT_peakmotifs_per_exp:
-    """ 
+    """
     Run RSAT peak-motifs (motif discovery with different algorithms) on every peakset.
 
     The set of N discovered motifs is stored in a single transfac file.
@@ -231,13 +231,13 @@ rule RSAT_peakmotifs_per_exp:
         -outdir {params.peakmo_outdir}
         """
 
-        
-        
+
+
 ##############################
 ## Matrix format conversion ##
 ##############################
 rule RSAT_PSSM_to_JASPAR_format:
-    """ 
+    """
     Convert the RSAT discovered matrices from transfac (tf) format to JASPAR format.
 
     The transfac file is split in several files (one per motif) adding as suffix the motif number (e.g., 1,2,3,...).
@@ -279,7 +279,7 @@ rule RSAT_PSSM_to_JASPAR_format:
 ##
 ## NOTE 3: Use the zip parameter to have a correct correspondency between the experiments (TF) and the number of the discovered motif (the number may vary depending the experiment), if zip is not used, snakemake will try to create all the combinations between TFs and number of motifs, since not all the TF produce the same number of motifs, the workflow will crash.
 rule JASPAR_PSSM_to_PWM:
-    """ 
+    """
     Convert the JASPAR PSSMs in PWMs.
 
     This rule is executed for each discovered motif.
@@ -303,7 +303,7 @@ rule JASPAR_PSSM_to_PWM:
 
 
 # rule Generate_matrix_logo:
-#     """ 
+#     """
 #     Generate motif logos.
 #     """
 #     input:
@@ -323,7 +323,7 @@ rule JASPAR_PSSM_to_PWM:
 
 
 rule Generate_matrix_logo:
-    """ 
+    """
     Generate motif logos using RSAT convert-matrix
 
     This rule is executed for each discovered motif.
@@ -356,7 +356,7 @@ rule Generate_matrix_logo:
 ## Matrix scan: find RSAT matrix sites ##
 #########################################
 rule find_RSAT_matrix_sites:
-    """ 
+    """
     Find the TFBSs used to built the matrices.
 
     This rule is executed for each discovered motif.
@@ -386,7 +386,7 @@ rule find_RSAT_matrix_sites:
 
 
 rule convert_RSAT_matrix_sites_to_BED:
-    """ 
+    """
     Get the genomic coordinates (BED file) of the matrix sites.
 
     This rule is executed for each discovered motif.
@@ -408,7 +408,7 @@ rule convert_RSAT_matrix_sites_to_BED:
 
 
 rule get_RSAT_matrix_sites_fasta:
-    """ 
+    """
     Get the fasta sequences from genomic coordinates (BED file) of the matrix sites.
 
     This rule is executed for each discovered motif.
@@ -433,7 +433,7 @@ rule get_RSAT_matrix_sites_fasta:
 ## Matrix scan: extended peaks (501bp) ##
 #########################################
 rule Scan_JASPAR_PWM:
-    """ 
+    """
     Scan the PWM in the extended peaks (501bp).
 
     This rule is executed for each discovered motif.
@@ -459,7 +459,7 @@ rule Scan_JASPAR_PWM:
 ## Centrality test and plots ##
 ###############################
 rule Calculate_centrimo_pvalue:
-    """ 
+    """
     Calculate p-value for central enrichment.
 
     This rule is executed for each discovered motif.
@@ -478,7 +478,7 @@ rule Calculate_centrimo_pvalue:
         89
     shell:
         """
-        mkdir -p {params.centrimo_folder} ; 
+        mkdir -p {params.centrimo_folder} ;
 
         nb_TFBS="$(wc -l {input.sites} | cut -d ' ' -f 1)" ;
 
@@ -487,9 +487,9 @@ rule Calculate_centrimo_pvalue:
         {params.scripts_bin}/centrimo_pval {input.sites} ${{nb_TFBS}} ${{nb_peaks}} 250 > {output}
         """
 
-        
+
 rule generate_centrimo_plots:
-    """ 
+    """
     Generate centrimo plots (local enrichment) around the peak summits.
 
     This rule is executed for each discovered motif.
@@ -509,9 +509,9 @@ rule generate_centrimo_plots:
         R --vanilla --slave --silent -f {params.scripts_bin}/centrimo_plot.R --args {input} {output}
         """
 
-        
+
 rule choose_best_centrimo_experiment:
-    """ 
+    """
     Select the motif with the best (lowest) centrimo p-value.
 
     This rule is executed for each dataset (experiment).
@@ -535,7 +535,7 @@ rule choose_best_centrimo_experiment:
 
 ## NOTE 4: the awk variables are relative to the ChIP-atlas experiment table.
 rule annotate_best_centrimo_experiment:
-    """ 
+    """
     Assing the TF name to the selected motif.
 
     This rule is executed for the best experiment of each dataset (experiment).
@@ -556,13 +556,13 @@ rule annotate_best_centrimo_experiment:
         motif_folder="$(more {input.best_exp} | cut -f1 | xargs dirname | perl -lne '$_ =~ s/central_enrichment/motifs\/jaspar\/logos/gi; print $_')";
 
         ##  -v: Pass variable as arguments
-        ##  
+        ##
         awk -v motif_n=$motif_name -v motif_f=$motif_folder 'NR==FNR{{mapping[$11] = $1}} NR!=FNR{{split($1, arr, "/"); split(arr[3], enc, "_"); print enc[1]"\\t"enc[3]"\\t"enc[3]"\\t"$0"\\t"motif_f"/"motif_n"_logo.png"}}' {input.tf_jaspar_map} {input.best_exp} > {output}
         """
 
 
 rule best_centrimo_experiment_logo:
-    """ 
+    """
     Export a PDF file with the motif logo, experiment, Tf name and centrality p-value.
 
     This rule is executed for the best experiment of each dataset (experiment).
@@ -579,12 +579,12 @@ rule best_centrimo_experiment_logo:
         85
     shell:
         """
-        bash {params.scripts_bin}/create_latex_logos.sh -i '{input}' -o '{output}'
+        bash {params.scripts_bin}/create_latex_logos.sh -l {params.scripts_bin}/latex_header.txt -i '{input}' -o '{output}'
         """
 
 
 rule Concat_annotated_experiments:
-    """ 
+    """
     Concatenate the tables with the annotated experiments and the centrality p-value
 
     """
@@ -599,12 +599,12 @@ rule Concat_annotated_experiments:
         84
     shell:
         """
-        ls {params.out_dir}/*/central_enrichment/selected_motif/*.501bp.fa.sites.centrimo.best.TF_associated | xargs cat > {output}  
+        ls {params.out_dir}/*/central_enrichment/selected_motif/*.501bp.fa.sites.centrimo.best.TF_associated | xargs cat > {output}
         """
-    
+
 
 rule Select_motifs_to_curate:
-    """ 
+    """
     Select those motifs satisfying the centrality p-value threshold.
 
     """
@@ -622,7 +622,7 @@ rule Select_motifs_to_curate:
         """
         cat {input} | awk '{{ if ($5 <= {params.central_pval}) {{ print }} }}' | uniq > {output}
         """
-        
+
 
 
 
