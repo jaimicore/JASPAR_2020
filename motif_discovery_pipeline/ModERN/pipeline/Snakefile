@@ -603,7 +603,7 @@ rule best_centrimo_experiment_logo:
         85
     shell:
         """
-        bash {params.scripts_bin}/create_latex_logos.sh -i '{input}' -o '{output}'
+        bash {params.scripts_bin}/create_latex_logos.sh -l {params.scripts_bin}/latex_header.txt -i '{input}' -o '{output}'
         """
 
 
