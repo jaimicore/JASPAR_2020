@@ -1,11 +1,11 @@
 
+# project
+
 # unix
 *~
-
-# Project-specific
 .Rhistory
 
-# Mac
+# mac
 *.DS_Store
 .AppleDouble
 .LSOverride
