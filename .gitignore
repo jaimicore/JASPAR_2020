@@ -1,5 +1,8 @@
 
 # project
+DATA_FILES/
+RESULTS/
+.snakemake/
 
 # unix
 *~

@@ -1,4 +1,8 @@
 # DOWNLOAD FROM http://cistrome.org/db/#/bdown
+
+mkdir DATA_FILES
+cd DATA_FILES
+
 MOUSE=cistromedb_mouse_factor_batch.gz
 HUMAN=cistromedb_human_factor_batch.gz
 
