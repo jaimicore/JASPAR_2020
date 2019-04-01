@@ -28,7 +28,7 @@ The following software and R libraries must be installed in order to run the com
 - *RSAT* (Regulatory Sequences analysis Tools) software: http://rsat-tagc.univ-mrs.fr/rsat/
 - Perl TFBS modules: http://tfbs.genereg.net/
 - *snakemake*: https://snakemake.readthedocs.io/en/stable/index.html
-
+- pdfunite
 
 ## Download ChIP-seq datasets from ChIP-atlas
 
