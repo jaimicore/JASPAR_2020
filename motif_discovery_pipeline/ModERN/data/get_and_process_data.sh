@@ -2,11 +2,14 @@
 #Supplemental Table 7 fly sites.txt
 #Supplemental Table 8 worm sites.txt
 
+mkdir DATA_FILES
+cd DATA_FILES
+
 ln -s Supplemental\ Table\ 7\ fly\ sites.txt ModERN_fly_peaks
 ln -s Supplemental\ Table\ 8\ worm\ sites.txt ModERN_worm_peaks
 
-perl split_into_individual_experiments_and_create_experiment_map.pl ModERN_worm_peaks
-perl create_experiment_maps.pl ModERN_worm_peaks worm
+perl ../split_into_individual_experiments_and_create_experiment_map.pl ModERN_worm_peaks
+perl ../create_experiment_maps.pl ModERN_worm_peaks worm
 
-perl split_into_individual_experiments_and_create_experiment_map.pl ModERN_fly_peaks
-perl create_experiment_maps.pl ModERN_fly_peaks fly
+perl ../split_into_individual_experiments_and_create_experiment_map.pl ModERN_fly_peaks
+perl ../create_experiment_maps.pl ModERN_fly_peaks fly
