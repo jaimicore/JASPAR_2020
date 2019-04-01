@@ -80,6 +80,7 @@ my $motif_folder  = "";
 my $centrimo_best_file_name = "";
 my $centrimo_best_file_name__basename = "";
 my $centrimo_best_pvalue  = "";
+my $PDF_motif_info = "";
 
 # RECREATE:
 # 1. motif_name="$(more $best_exp | cut -f1 | xargs basename | cut -d'.' -f1 | perl -lne '$_ =~ s/_m(\\d+)$/_peak-motifs_m$1/g; print $_ ')";
@@ -90,7 +91,7 @@ while(<BEST_EXP_FH>){
 	
 	my @F = split /\t/;
 	$centrimo_best_file_name = $F[0];
-	$centrimo_best_pvalue = $F[1];
+	$centrimo_best_pvalue = "$F[1]";
 	
 	$centrimo_best_file_name__basename = basename($centrimo_best_file_name);
 	my $centrimo_best_file_name__dirname  = dirname($centrimo_best_file_name);
@@ -101,6 +102,12 @@ while(<BEST_EXP_FH>){
 	my @F2 = split /\./, $centrimo_best_file_name__basename;
 	$motif = $F2[0];
 	$motif =~ s/_m(\d+)$/_peak-motifs_m$1/g;
+
+	## PDF with selected motif
+	$PDF_motif_info = $centrimo_best_file_name__dirname;
+	my $TF_exp_name = $F2[0];
+	$TF_exp_name =~ s/_m\d+$//gi;
+	$PDF_motif_info = $PDF_motif_info."/selected_motif/".$TF_exp_name.".501bp.fa.sites.centrimo.best.TF_associated.pdf";
 
 	# rename the path name, e.g.
 	# from /home/rvdlee/JASPAR/ModERN/results/ModERN_fly/output/dm_Stat92E-GFP_Stat92E_E12-24/central_enrichment
@@ -154,7 +161,7 @@ my $logo_png_filepath = File::Spec->catfile($motif_folder, $motif . "_logo.png")
 
 ## create the output file
 open(OUTFILE_FG, ">$output");
-print OUTFILE_FG $exp_id . "\t" . $exp_tf . "\t" . $exp_tf . "\t" . $centrimo_best_file_name . "\t" . $centrimo_best_pvalue . "\t" . $logo_png_filepath . "\n"; 
+print OUTFILE_FG $exp_id . "\t" . $exp_tf . "\t" . $exp_tf . "\t" . $centrimo_best_file_name . "\t" . $centrimo_best_pvalue . "\t" . $logo_png_filepath . "\t" . $PDF_motif_info . "\n"; 
 close(OUTFILE_FG);
 
 

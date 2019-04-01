@@ -11,6 +11,7 @@ $0 -l <latex header file> -i <input file> -o <output file>
 """;
 
 TEMP=`getopt -o ho:i:l: -- "$@"`;
+
 if [ $? != 0 ]
 then
   echo "Terminating..." >&2;
@@ -57,15 +58,19 @@ sort -k3,3 -k5,5n $input | \
 while read line
 do
     tfname=$(echo $line | cut -d ' ' -f 3 | tr '_' '-');
-    #tfname=$(echo $line | cut -f3 | tr '_' '-');
     exp_ID=$(echo $line | cut -d ' ' -f 1 | tr '_' '-');
-    #exp_ID=$(echo $line | cut -f1);
     centrimo_file=$(echo $line | cut -d ' ' -f 4);
-    #centrimo_file=$(echo $line | cut -f4);
-    centrimo_pval=$(echo $line | cut -d ' ' -f 5);
-    #centrimo_pval=$(echo $line | cut -f5);
+    centrimo_pval=$(echo $line | cut -d ' ' -f5);
     motif_logo=$(echo $line | cut -d ' ' -f 6);
-    #motif_logo=$(echo $line | cut -f6);
+    motif_pdf=$(echo $line | cut -d ' ' -f 7);
+    
+    # tfname=$(echo $line | cut -f3 | tr '_' '-');
+    # exp_ID=$(echo $line | cut -f1);
+    # centrimo_file=$(echo $line | cut -f4);
+    #centrimo_pval=$(echo $line | cut -f5);
+    # motif_logo=$(echo $line | cut -f6);
+    # motif_pdf=$(echo $line | cut -f7);
+
    # if (( $(echo "$centrimo_pval < 0." | bc -l) ))
     #then
         #echo "TFname "$tfname;
