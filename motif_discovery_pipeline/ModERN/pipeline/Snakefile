@@ -533,11 +533,10 @@ rule choose_best_centrimo_experiment:
         """
 
 
-### DEPRECATED, NEW VERSION BELOW
-# ## NOTE 4: the awk variables are relative to the ChIP-atlas experiment table.
+## NOTE 4: the awk variables are relative to the ChIP-atlas experiment table.
 # rule annotate_best_centrimo_experiment:
 #     """
-#     Assign the TF name to the selected motif.
+#     Assing the TF name to the selected motif.
 
 #     This rule is executed for the best experiment of each dataset (experiment).
 #     """
@@ -560,7 +559,6 @@ rule choose_best_centrimo_experiment:
 #         ##
 #         awk -v motif_n=$motif_name -v motif_f=$motif_folder 'NR==FNR{{mapping[$11] = $1}} NR!=FNR{{split($1, arr, "/"); split(arr[3], enc, "_"); print enc[1]"\\t"enc[3]"\\t"enc[3]"\\t"$0"\\t"motif_f"/"motif_n"_logo.png"}}' {input.tf_jaspar_map} {input.best_exp} > {output}
 #         """
-## NOTE 4: the awk variables are relative to the ChIP-atlas experiment table.
 
 rule annotate_best_centrimo_experiment:
     """
@@ -587,7 +585,7 @@ rule annotate_best_centrimo_experiment:
 
 rule best_centrimo_experiment_logo:
     """
-    Export a PDF file with the motif logo, experiment, Tf name and centrality p-value.
+    Export a PDF file with the motif logo, experiment, TF name and centrality p-value.
 
     This rule is executed for the best experiment of each dataset (experiment).
     """
@@ -603,7 +601,7 @@ rule best_centrimo_experiment_logo:
         85
     shell:
         """
-        bash {params.scripts_bin}/create_latex_logos.sh -l {params.scripts_bin}/latex_header.txt -i '{input}' -o '{output}'
+        bash {params.scripts_bin}/create_latex_logos.sh -l {params.scripts_bin}/latex_header.txt -i {input} -o {output}
         """
 
 
@@ -648,9 +646,21 @@ rule Select_motifs_to_curate:
         """
 
 
+rule Motifs_to_curate_PDF:
+    """
+    Concat the PDF of the selected motifs
+    """
+    input:
+        os.path.join(config["curation_dir"], "Selected_motifs_to_curate_log10_pval_-200.tab")
+    output:
+        os.path.join(config["curation_dir"], "Selected_motifs_to_curate_log10_pval_-200.pdf")
+    message:
+        "; Concatenating PDFs with the motifs to curate "
+    priority:
+        82
+    shell:
+        """
+        PDF_FILES=` awk '{{ print $7 }}' {input} | xargs `
 
-
-#ChIP-atlas_results/sacCer3/SRX3433196_BY4741_GCN4/central_enrichment/selected_motif/SRX3433196_BY4741_GCN4.501bp.fa.sites.centrimo.best.TF_associated ChIP-atlas_results/sacCer3/SRX3433196_BY4741_GCN4/central_enrichment/selected_motif/SRX3433196_BY4741_GCN4.501bp.fa.sites.centrimo.best.TF_associated ChIP-atlas_results/sacCer3/SRX3433196_BY4741_GCN4/central_enrichment/selected_motif/SRX3433196_BY4741_GCN4.501bp.fa.sites.centrimo.best.TF_associated ChIP-atlas_results/sacCer3/SRX3433196_BY4741_GCN4/central_enrichment/selected_motif/SRX3433196_BY4741_GCN4.501bp.fa.sites.centrimo.best.TF_associated
-
-
-# TEST=`ls ChIP-atlas_results/sacCer3/SRX3433196_BY4741_GCN4/central_enrichment/selected_motif/SRX3433196_BY4741_GCN4.501bp.fa.sites.centrimo.best.TF_associated ChIP-atlas_results/sacCer3/SRX3433196_BY4741_GCN4/central_enrichment/selected_motif/SRX3433196_BY4741_GCN4.501bp.fa.sites.centrimo.best.TF_associated ChIP-atlas_results/sacCer3/SRX3433196_BY4741_GCN4/central_enrichment/selected_motif/SRX3433196_BY4741_GCN4.501bp.fa.sites.centrimo.best.TF_associated ChIP-atlas_results/sacCer3/SRX3433196_BY4741_GCN4/central_enrichment/selected_motif/SRX3433196_BY4741_GCN4.501bp.fa.sites.centrimo.best.TF_associated`
+        pdfunite $PDF_FILES {output}
+        """
