@@ -57,8 +57,8 @@ message("; GTRD version: ", GTRD.version)
 ###########################
 ## Create output folders ##
 ###########################
-GTRD.data.folder <- file.path(out.folder, "data", genome)
-GTRD.experiment.table.folder <- file.path(out.folder, "experiment_table",  genome)
+GTRD.data.folder <- file.path(out.folder, "data", "peaks", genome)
+GTRD.experiment.table.folder <- file.path(out.folder, "data", "experiment_table",  genome)
 message("; ")
 message("; Creating output folders")
 message("; ", GTRD.data.folder)
