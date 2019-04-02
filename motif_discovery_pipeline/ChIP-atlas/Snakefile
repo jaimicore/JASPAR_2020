@@ -4,7 +4,7 @@ import os
 import itertools
 import subprocess
 from snakemake.utils import R
-configfile: "config.yaml"
+#configfile: "config.yaml"
 
 
 ##########################
@@ -532,7 +532,7 @@ rule choose_best_centrimo_experiment:
         bash {params.scripts_bin}/best_centrimo.sh -i {params.centrimo_dir} > {output}
         """
 
-
+## Deprecated rule
 ## NOTE 4: the awk variables are relative to the ChIP-atlas experiment table.
 # rule annotate_best_centrimo_experiment:
 #     """
