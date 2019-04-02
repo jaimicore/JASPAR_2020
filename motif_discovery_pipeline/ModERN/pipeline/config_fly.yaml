@@ -45,7 +45,7 @@ central_pvalue : -200
 ## ModERN fly: folders and required input files ##
 ## ============================================ ##
 data_folder : /home/rvdlee/jaspar_2020/motif_discovery_pipeline/ModERN/data/DATA_FILES/ModERN_fly_peaks_DATA
-TF_Experiment_map : /home/rvdlee/jaspar_2020/motif_discovery_pipeline/ModERN/data/ModERN_fly_peaks_experiment_map.txt
+TF_Experiment_map : /home/rvdlee/jaspar_2020/motif_discovery_pipeline/ModERN/data/DATA_FILES/ModERN_fly_peaks_experiment_map.txt
 genome_fasta : /home/rvdlee/GENOMES/dm6.fa 
 genome_size : /home/rvdlee/GENOMES/dm6.chrom.sizes
 out_dir : /home/rvdlee/jaspar_2020/motif_discovery_pipeline/ModERN/RESULTS/ModERN_fly/output

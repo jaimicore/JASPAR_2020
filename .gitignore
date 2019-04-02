@@ -3,6 +3,7 @@
 DATA_FILES/
 RESULTS/
 .snakemake/
+*svg
 
 # unix
 *~
