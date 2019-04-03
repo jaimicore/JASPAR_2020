@@ -99,15 +99,16 @@ while(<BEST_EXP_FH>){
 	# get first part of centrimo_best_file_name and rename it, e.g.
 	# from dm_Stat92E-GFP_Stat92E_E12-24_m1
 	# to dm_Stat92E-GFP_Stat92E_E12-24_peak-motifs_m1
-	$centrimo_best_file_name__basename =~ ^(\S+)(\.\d+bp\.fa\.sites\.centrimo\.best)$ # get the file extension, tricky because some worm ID contain a period, e.g. ce_OP532_Y116A8C.19_L1_WA.501bp.fa.sites.centrimo.best         	$1 will contain "ce_OP532_Y116A8C.19_L1_WA", $2 will contain ".501bp.fa.sites.centrimo.best"
+	$centrimo_best_file_name__basename =~ /^(\S+)(\.\d+bp\.fa\.sites\.centrimo)$/; # get the file extension, tricky because some worm ID contain a period, e.g. ce_OP532_Y116A8C.19_L1_WA_m5.501bp.fa.sites.centrimo	$1 will contain "ce_OP532_Y116A8C.19_L1_WA_m5", $2 will contain ".501bp.fa.sites.centrimo"
 	$motif = $1;
+        my $TF_exp_name = $1;
+	my $extension = $2;
 	$motif =~ s/_m(\d+)$/_peak-motifs_m$1/g;
 
 	## PDF with selected motif
 	$PDF_motif_info = $centrimo_best_file_name__dirname;
-	my $TF_exp_name = $1;
 	$TF_exp_name =~ s/_m\d+$//gi;
-	$PDF_motif_info = $PDF_motif_info."/selected_motif/".$TF_exp_name.$2.".TF_associated.pdf";
+	$PDF_motif_info = $PDF_motif_info."/selected_motif/".$TF_exp_name.$extension.".TF_associated.pdf";
 
 	# rename the path name, e.g.
 	# from /home/rvdlee/JASPAR/ModERN/results/ModERN_fly/output/dm_Stat92E-GFP_Stat92E_E12-24/central_enrichment
