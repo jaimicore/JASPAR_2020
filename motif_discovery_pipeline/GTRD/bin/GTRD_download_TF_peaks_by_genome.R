@@ -92,6 +92,12 @@ peaks.file <- gsub(file.download, pattern = "\\.gz", replacement = "")
 #####################
 peaks.tab <- fread(peaks.file)
 peaks.tab$ID <- paste(peaks.tab$experiment, peaks.tab$tfTitle, sep = "_")
+peaks.tab$ID <- gsub(peaks.tab$ID, pattern = "\\.", replacement = "-")
+peaks.tab$ID <- gsub(peaks.tab$ID, pattern = "\\(", replacement = "-")
+peaks.tab$ID <- gsub(peaks.tab$ID, pattern = "\\)", replacement = "-")
+peaks.tab$ID <- gsub(peaks.tab$ID, pattern = ":", replacement = "-")
+peaks.tab$ID <- gsub(peaks.tab$ID, pattern = "\\", replacement = "-", fixed=TRUE)
+
 
 ###################################
 ## Split the table by experiment ##
@@ -101,13 +107,16 @@ peaks.tab.list <- split(peaks.tab, f = peaks.tab$ID)
 
 silence <- sapply(names(peaks.tab.list), function(ID){
   
-  ## Create output folder following the folder structure required by the Snakefile
-  peaks.out.folder <- file.path(GTRD.data.folder, ID)
-  dir.create(peaks.out.folder, recursive = TRUE, showWarnings = FALSE)
-  
-  message("; Exporting peaks - Experiment: ", ID)
-  experiment.peaks.file <- file.path(peaks.out.folder, paste0(ID, "_peaks.narrowPeak"))
-  fwrite(peaks.tab.list[[ID]], file = experiment.peaks.file, quote = FALSE, sep = "\t", row.names = FALSE, col.names = FALSE)
+  if(nrow(peaks.tab.list[[ID]]) >= 30){
+    
+    ## Create output folder following the folder structure required by the Snakefile
+    peaks.out.folder <- file.path(GTRD.data.folder, ID)
+    dir.create(peaks.out.folder, recursive = TRUE, showWarnings = FALSE)
+    
+    message("; Exporting peaks - Experiment: ", ID)
+    experiment.peaks.file <- file.path(peaks.out.folder, paste0(ID, "_peaks.narrowPeak"))
+    fwrite(peaks.tab.list[[ID]], file = experiment.peaks.file, quote = FALSE, sep = "\t", row.names = FALSE, col.names = FALSE)
+  }
 })
 
 ## Export experiment table
