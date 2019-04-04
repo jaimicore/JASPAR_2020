@@ -76,8 +76,14 @@ wget ftp://ftp.ensembl.org/pub/release-95/fasta/caenorhabditis_elegans/dna/Caeno
 gunzip ./data/genomes/WBcel235/*.fa.gz
 
 ## One fasta file
-cat ./data/genomes/WBcel235/*.fa > ./data/genomes/WBcel235/WBcel235.fa
+cat ./data/genomes/WBcel235/*.fa > ./data/genomes/WBcel235/WBcel235.fa.ori
 rm ./data/genomes/WBcel235/*.*.fa
+
+## Rename chromosome
+## Add the prefix 'chr'.
+## Rename the mitochondrial chromosome: Mito -> chrMT
+more ./data/genomes/WBcel235/WBcel235.fa.ori | perl -lne ' unless(/^>chr/){ $_ =~ s/^>/>chr/gi}; print $_ ' > ./data/genomes/WBcel235/WBcel235.fa.ori
+
 
 ## Generate the chromosome size file
 samtools faidx ./data/genomes/WBcel235/WBcel235.fa
