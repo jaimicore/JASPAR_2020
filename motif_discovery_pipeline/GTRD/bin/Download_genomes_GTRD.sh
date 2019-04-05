@@ -82,7 +82,7 @@ rm ./data/genomes/WBcel235/*.*.fa
 ## Rename chromosome
 ## Add the prefix 'chr'.
 ## Rename the mitochondrial chromosome: Mito -> chrMT
-more ./data/genomes/WBcel235/WBcel235.fa.ori | perl -lne ' unless(/^>chr/){ $_ =~ s/^>/>chr/gi}; print $_ ' > ./data/genomes/WBcel235/WBcel235.fa.ori
+more ./data/genomes/WBcel235/WBcel235.fa.ori | perl -lne ' unless(/^>chr/){ $_ =~ s/^>/>chr/gi}; print $_ ' > ./data/genomes/WBcel235/WBcel235.fa
 
 
 ## Generate the chromosome size file
