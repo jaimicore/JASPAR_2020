@@ -97,6 +97,7 @@ peaks.tab$ID <- gsub(peaks.tab$ID, pattern = "\\(", replacement = "-")
 peaks.tab$ID <- gsub(peaks.tab$ID, pattern = "\\)", replacement = "-")
 peaks.tab$ID <- gsub(peaks.tab$ID, pattern = ":", replacement = "-")
 peaks.tab$ID <- gsub(peaks.tab$ID, pattern = "\\", replacement = "-", fixed=TRUE)
+peaks.tab$ID <- gsub(peaks.tab$ID, pattern = "_$", replacement = "", perl = TRUE)
 
 
 ###################################
