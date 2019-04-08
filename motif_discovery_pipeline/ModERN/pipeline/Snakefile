@@ -111,6 +111,7 @@ rule all:
            MOST_ENRICHED_MOTIF_ASSOC, \
            MOST_ENRICHED_MOTIF_ASSOC_LOGO, \
            MOTIFS_TO_CURATE, \
+           os.path.join(config["curation_dir"], "Selected_motifs_to_curate_log10_pval_-200.pdf"), \
 
 
 
