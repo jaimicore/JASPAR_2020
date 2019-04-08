@@ -103,10 +103,6 @@ while(<BEST_EXP_FH>){
 	$motif = $1;
     my $TF_exp_name = $1;
 	my $extension = $2;
-	
-	# prevent error in later latex step: ! LaTeX Error: Unknown graphics extension: .16_LE_WA_peak-motifs_m5_logo.png.
-    # This removes any internal dots in the basename of the file, except for the dot in the extension (e.g. except the .png part)
-	$motif =~ s/(\.)(?=[^.]*\.?)/\_/;
 	$motif =~ s/_m(\d+)$/_peak-motifs_m$1/g;
 
 	## PDF with selected motif

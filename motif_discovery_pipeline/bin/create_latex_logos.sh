@@ -61,7 +61,14 @@ do
     exp_ID=$(echo $line | cut -d ' ' -f 1 | tr '_' '-');
     centrimo_file=$(echo $line | cut -d ' ' -f 4);
     centrimo_pval=$(echo $line | cut -d ' ' -f 5);
-    motif_logo=$(echo $line | cut -d ' ' -f 6);
+    
+    motif_logo_original=$(echo $line | cut -d ' ' -f 6);
+    # prevent error: ! LaTeX Error: Unknown graphics extension: .16_LE_WA_peak-motifs_m5_logo.png.
+    # This removes any internal dots in the basename of the file, except for the dot in the extension (e.g. except the .png part)
+    motif_logo=$(basename `echo $motif_logo_original` | perl -pe 's/(\.)(?=[^.]*\.)/\_/');
+    # this create a symbolic link so that that new motif filename will actually exist
+    ln -s motif_logo_original motif_logo
+
     motif_pdf=$(echo $line | cut -d ' ' -f 7);
     
     # tfname=$(echo $line | cut -f3 | tr '_' '-');
