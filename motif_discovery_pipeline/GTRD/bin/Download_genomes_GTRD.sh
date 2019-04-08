@@ -42,8 +42,13 @@ wget ftp://ftp.ensemblgenomes.org/pub/plants/release-42/fasta/arabidopsis_thalia
 gunzip ./data/genomes/TAIR10/*.fa.gz
 
 ## One fasta file
-cat ./data/genomes/TAIR10/*.fa > ./data/genomes/TAIR10/TAIR10.fa
+cat ./data/genomes/TAIR10/*.fa > ./data/genomes/TAIR10/TAIR10.fa.ori
 rm ./data/genomes/TAIR10/*.*.fa
+
+## Rename chromosome
+## Add the prefix 'chr'
+more ./data/genomes/TAIR10/TAIR10.fa.ori | perl -lne ' unless(/^>chr/){ $_ =~ s/^>/>chr/gi}; print $_ ' > ./data/genomes/TAIR10/TAIR10.fa
+
 
 ## Generate the chromosome size file
 samtools faidx ./data/genomes/TAIR10/TAIR10.fa
