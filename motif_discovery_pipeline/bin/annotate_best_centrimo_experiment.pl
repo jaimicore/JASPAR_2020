@@ -101,8 +101,12 @@ while(<BEST_EXP_FH>){
 	# to dm_Stat92E-GFP_Stat92E_E12-24_peak-motifs_m1
 	$centrimo_best_file_name__basename =~ /^(\S+)(\.\d+bp\.fa\.sites\.centrimo)$/; # get the file extension, tricky because some worm ID contain a period, e.g. ce_OP532_Y116A8C.19_L1_WA_m5.501bp.fa.sites.centrimo	$1 will contain "ce_OP532_Y116A8C.19_L1_WA_m5", $2 will contain ".501bp.fa.sites.centrimo"
 	$motif = $1;
-        my $TF_exp_name = $1;
+    my $TF_exp_name = $1;
 	my $extension = $2;
+	
+	# prevent error in later latex step: ! LaTeX Error: Unknown graphics extension: .16_LE_WA_peak-motifs_m5_logo.png.
+    # This removes any internal dots in the basename of the file, except for the dot in the extension (e.g. except the .png part)
+	$motif =~ s/(\.)(?=[^.]*\.?)/\_/;
 	$motif =~ s/_m(\d+)$/_peak-motifs_m$1/g;
 
 	## PDF with selected motif

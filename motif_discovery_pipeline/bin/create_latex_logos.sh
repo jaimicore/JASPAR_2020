@@ -60,7 +60,7 @@ do
     tfname=$(echo $line | cut -d ' ' -f 3 | tr '_' '-');
     exp_ID=$(echo $line | cut -d ' ' -f 1 | tr '_' '-');
     centrimo_file=$(echo $line | cut -d ' ' -f 4);
-    centrimo_pval=$(echo $line | cut -d ' ' -f5);
+    centrimo_pval=$(echo $line | cut -d ' ' -f 5);
     motif_logo=$(echo $line | cut -d ' ' -f 6);
     motif_pdf=$(echo $line | cut -d ' ' -f 7);
     
