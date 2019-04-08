@@ -82,7 +82,7 @@ MOST_ENRICHED_MOTIF_ASSOC_LOGO = expand(os.path.join(config["out_dir"], "{TF}", 
 
 ## Selected motifs to curate
 MOTIFS_TO_CURATE = os.path.join(config["curation_dir"], "Selected_motifs_to_curate_log10_pval_-200.tab")
-
+MOTIFS_TO_CURATE_PDF = os.path.join(config["curation_dir"], "Selected_motifs_to_curate_log10_pval_-200.pdf")
 
 ################################################################
 ## Rules
@@ -111,7 +111,8 @@ rule all:
            MOST_ENRICHED_MOTIF_ASSOC, \
            MOST_ENRICHED_MOTIF_ASSOC_LOGO, \
            MOTIFS_TO_CURATE, \
-           os.path.join(config["curation_dir"], "Selected_motifs_to_curate_log10_pval_-200.pdf"), \
+           #MOTIFS_TO_CURATE_PDF, \
+           
 
 
 
@@ -533,33 +534,6 @@ rule choose_best_centrimo_experiment:
         bash {params.scripts_bin}/best_centrimo.sh -i {params.centrimo_dir} > {output}
         """
 
-## Deprecated rule
-## NOTE 4: the awk variables are relative to the ChIP-atlas experiment table.
-# rule annotate_best_centrimo_experiment:
-#     """
-#     Assing the TF name to the selected motif.
-
-#     This rule is executed for the best experiment of each dataset (experiment).
-#     """
-#     input:
-#         tf_jaspar_map = config["TF_Experiment_map"],
-#         best_exp = os.path.join(config["out_dir"], "{TF}", "central_enrichment", "selected_motif", "{TF}.501bp.fa.sites.centrimo.best")
-#     output:
-#         os.path.join(config["out_dir"], "{TF}", "central_enrichment", "selected_motif", "{TF}.501bp.fa.sites.centrimo.best.TF_associated")
-#     message:
-#         "; Assigning TF name to the experiment: {wildcards.TF} "
-#     priority:
-#         86
-#     shell:
-#         """
-#         motif_name="$(more {input.best_exp} | cut -f1 | xargs basename | cut -d'.' -f1 | perl -lne '$_ =~ s/_m(\\d+)$/_peak-motifs_m$1/g; print $_ ')";
-
-#         motif_folder="$(more {input.best_exp} | cut -f1 | xargs dirname | perl -lne '$_ =~ s/central_enrichment/motifs\/jaspar\/logos/gi; print $_')";
-
-#         ##  -v: Pass variable as arguments
-#         ##
-#         awk -v motif_n=$motif_name -v motif_f=$motif_folder 'NR==FNR{{mapping[$11] = $1}} NR!=FNR{{split($1, arr, "/"); split(arr[3], enc, "_"); print enc[1]"\\t"enc[3]"\\t"enc[3]"\\t"$0"\\t"motif_f"/"motif_n"_logo.png"}}' {input.tf_jaspar_map} {input.best_exp} > {output}
-#         """
 
 rule annotate_best_centrimo_experiment:
     """
@@ -609,7 +583,6 @@ rule best_centrimo_experiment_logo:
 rule Concat_annotated_experiments:
     """
     Concatenate the tables with the annotated experiments and the centrality p-value
-
     """
     input:
         MOST_ENRICHED_MOTIF_ASSOC
@@ -617,13 +590,18 @@ rule Concat_annotated_experiments:
         os.path.join(config["curation_dir"], "Annotated_experiments_cat.tab")
     message:
         "; Concatenating the tables with the annotated experiments and the centrality p-value "
-    params: out_dir = config["out_dir"]
+    params:
+        out_dir = config["out_dir"]
     priority:
         84
     shell:
         """
-        ls {params.out_dir}/*/central_enrichment/selected_motif/*.501bp.fa.sites.centrimo.best.TF_associated | xargs cat > {output}
+        ls {input} | xargs cat > {output}
         """
+    
+        # """
+        # ls {params.out_dir}/*/central_enrichment/selected_motif/*.501bp.fa.sites.centrimo.best.TF_associated | xargs cat > {output}
+        # """
 
 
 rule Select_motifs_to_curate:
