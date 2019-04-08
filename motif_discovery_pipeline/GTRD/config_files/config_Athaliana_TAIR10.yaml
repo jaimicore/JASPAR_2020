@@ -41,12 +41,12 @@ peakmotifs_class_interval : 25
 central_pvalue : -200
 
 
-## ===================================== ##
-## dm3: folders and required input files ##
-## ===================================== ##
-data_folder : /storage/scratch/JASPAR_2020/ChIP-atlas/dm3/data
-genome_fasta : /storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/ChIP-atlas/genomes/dm3/dm3.fa
-genome_size : /storage/mathelierarea/processed/jamondra/Projects/JASPAR/post_processing/ChIP-atlas/genomes/dm3/dm3.chrom.sizes
-TF_Experiment_map : /storage/scratch/JASPAR_2020/ChIP-atlas/dm3/experiment_table/experimentList_TFs_and_others.tab
-out_dir : ChIP-atlas_results/dm3
-curation_dir : ChIP-atlas_results/curation/dm3
+## =============================================================== ##
+## Arabidopsis thaliana (TAIR10): folders and required input files ##
+## =============================================================== ##
+data_folder : /storage/scratch/JASPAR_2020/jaspar_2020/motif_discovery_pipeline/GTRD/data/peaks/Arabidopsis_thaliana
+genome_fasta : /storage/scratch/JASPAR_2020/jaspar_2020/motif_discovery_pipeline/GTRD/data/genomes/TAIR10/TAIR10.fa
+genome_size : /storage/scratch/JASPAR_2020/jaspar_2020/motif_discovery_pipeline/GTRD/data/genomes/TAIR10/TAIR10.chrom.sizes
+TF_Experiment_map : /storage/scratch/JASPAR_2020/jaspar_2020/motif_discovery_pipeline/GTRD/data/experiment_table/Arabidopsis_thaliana/Arabidopsis_thaliana_GTRD_experiment_table.tab
+out_dir : GTRD_results/Arabidopsis_thaliana_TAIR10
+curation_dir : GTRD_results/curation/Arabidopsis_thaliana_TAIR10
