@@ -108,7 +108,7 @@ while(<BEST_EXP_FH>){
 	## PDF with selected motif
 	$PDF_motif_info = $centrimo_best_file_name__dirname;
 	$TF_exp_name =~ s/_m\d+$//gi;
-	$PDF_motif_info = $PDF_motif_info."/selected_motif/".$TF_exp_name.$extension.".TF_associated.pdf";
+	$PDF_motif_info = $PDF_motif_info."/selected_motif/".$TF_exp_name.$extension.".best.TF_associated.pdf";
 
 	# rename the path name, e.g.
 	# from /home/rvdlee/JASPAR/ModERN/results/ModERN_fly/output/dm_Stat92E-GFP_Stat92E_E12-24/central_enrichment
