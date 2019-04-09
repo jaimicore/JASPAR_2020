@@ -19,12 +19,8 @@ rm -rf $MOUSE
 tar xfz mouse_factor.tar.gz
 rm -rf mouse_factor.tar.gz
 
-perl CistromeDB_create_file_structure.pl human_factor
-perl CistromeDB_create_file_structure.pl mouse_factor
+perl ../CistromeDB_create_file_structure.pl human_factor
+perl ../CistromeDB_create_file_structure.pl mouse_factor
 
-# perl split_into_individual_experiments_and_create_experiment_map.pl ModERN_worm_peaks
-# perl create_experiment_maps.pl ModERN_worm_peaks worm
-
-# perl split_into_individual_experiments_and_create_experiment_map.pl ModERN_fly_peaks
-# perl create_experiment_maps.pl ModERN_fly_peaks fly
-
+tail -n +2 human_factor.txt | cut -f 1,2,7 > CistromeDB_human_experiment_map.txt
+tail -n +2 mouse_factor.txt | cut -f 1,2,7 > CistromeDB_mouse_experiment_map.txt

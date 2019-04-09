@@ -1,0 +1,52 @@
+################################################################
+author: Jaime_A_Castro_Mondragon
+author2: Robin_van_der_Lee
+
+###############################
+## Expected folder structure ##
+###############################
+## The Snakefile will launch a motif analysis + calculate centrality for each discovered motifs for every set of peaks in Narrowpeak format found in the 'data_folder'.
+##
+## Example:
+##
+## cd data_folder
+##
+## .
+## ├── ERX032305_S2_Lint-1
+## │   └── ERX032305_S2_Lint-1_peaks.narrowPeak
+## └── ERX032306_Kc_Lint-1
+##     └── ERX032306_Kc_Lint-1_peaks.narrowPeak
+##
+## Every EXPERIMENT_FOLDER in the data folder must contain a narrowPeak file with the same name, see tree above.
+## This is the data structure required by the pipeline.
+
+
+## === ##
+## Bin ##
+## === ##
+bin : /home/rvdlee/jaspar_2020/motif_discovery_pipeline/bin
+python : python2.7
+RSAT : /sp1work/Tools/rsat
+
+
+## ============================================= ##
+## Motif discovery (RSAT peak-motifs) parameters ##
+## ============================================= ##
+peakmotifs_disco : oligos,dyads,positions,local_words
+peakmotifs_disco_nb_motifs : 2
+peakmotifs_disco_min_oligo : 6
+peakmotifs_disco_max_oligo : 7
+peakmotifs_class_interval : 25
+
+central_pvalue : -200
+
+
+## ============================================= ##
+## Folders and required input files ##
+## ============================================= ##
+data_folder : /home/rvdlee/jaspar_2020/motif_discovery_pipeline/CistromeDB/data/DATA_FILES/mouse_factor
+TF_Experiment_map : /home/rvdlee/jaspar_2020/motif_discovery_pipeline/CistromeDB/data/DATA_FILES/CistromeDB_mouse_experiment_map.txt
+genome_fasta : /sp1work/Genomes/mm10/mm10.fa
+genome_size : /sp1work/Genomes/mm10/mm10.chrom.sizes
+out_dir : /home/rvdlee/jaspar_2020/motif_discovery_pipeline/CistromeDB/RESULTS/CistromeDB_mouse/output
+curation_dir : /home/rvdlee/jaspar_2020/motif_discovery_pipeline/CistromeDB/RESULTS/CistromeDB_mouse/curation
