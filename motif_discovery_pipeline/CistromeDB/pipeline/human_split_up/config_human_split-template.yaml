@@ -44,11 +44,11 @@ central_pvalue : -200
 ## ============================================= ##
 ## Folders and required input files ##
 ## ============================================= ##
-data_folder : /home/rvdlee/jaspar_2020/motif_discovery_pipeline/CistromeDB/data/DATA_FILES/mouse_factor
-TF_Experiment_map : /home/rvdlee/jaspar_2020/motif_discovery_pipeline/CistromeDB/data/DATA_FILES/CistromeDB_mouse_experiment_map.txt
-genome_fasta : /sp1work/Genomes/mm10/mm10.fa
-genome_size : /sp1work/Genomes/mm10/mm10.chrom.sizes
-out_dir : /sp2work/rvdlee/CistromeDB/RESULTS/CistromeDB_mouse/output
-#out_dir : /home/rvdlee/jaspar_2020/motif_discovery_pipeline/CistromeDB/RESULTS/CistromeDB_mouse/output
-curation_dir : /sp2work/rvdlee/CistromeDB/RESULTS/CistromeDB_mouse/curation
-#curation_dir : /home/rvdlee/jaspar_2020/motif_discovery_pipeline/CistromeDB/RESULTS/CistromeDB_mouse/curation
+data_folder : /home/rvdlee/sp2work/rvdlee/jaspar_2020/motif_discovery_pipeline/CistromeDB/data/DATA_FILES/HUMAN_SPLIT_UP/human_factor_all_{REPLACE}_DATA/
+TF_Experiment_map : /home/rvdlee/sp2work/rvdlee/jaspar_2020/motif_discovery_pipeline/CistromeDB/data/DATA_FILES/CistromeDB_human_experiment_map.txt
+
+genome_fasta : /sp1work/Genomes/hg38/hg38.fa
+genome_size : /sp1work/Genomes/hg38/hg38.chrom.sizes
+
+out_dir : /sp3work/rvdlee/CistromeDB/RESULTS/CistromeDB_human_{REPLACE}/output
+curation_dir : /sp3work/rvdlee/CistromeDB/RESULTS/CistromeDB_human_{REPLACE}/curation

@@ -19,8 +19,8 @@ rm -rf $MOUSE
 tar xfz mouse_factor.tar.gz
 rm -rf mouse_factor.tar.gz
 
-perl ../CistromeDB_create_file_structure.pl human_factor
-perl ../CistromeDB_create_file_structure.pl mouse_factor
+perl CistromeDB_create_file_structure.pl human_factor
+perl CistromeDB_create_file_structure.pl mouse_factor
 
 tail -n +2 human_factor.txt | cut -f 1,2,7 > CistromeDB_human_experiment_map.txt
 tail -n +2 mouse_factor.txt | cut -f 1,2,7 > CistromeDB_mouse_experiment_map.txt
