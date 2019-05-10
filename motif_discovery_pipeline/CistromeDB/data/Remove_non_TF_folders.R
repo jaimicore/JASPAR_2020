@@ -29,16 +29,21 @@ opt = parse_args(opt_parser);
 
 organism <- opt$organism
 data.folder <- opt$data_folder
+tf.tab.file <- opt$tf_assoc_table
 
 # tf.tab.file <- "CistromeDB_mouse_experiment_map.txt"
 # organism <- "mouse"
 # data.folder <- "DATA_FILES/mouse_factor_bk"
+#
+# tf.tab.file <- "CistromeDB_human_experiment_map.txt"
+# organism <- "human"
+# data.folder <- "DATA_FILES_BAK/human_factor"
 
 
 ###############################
 ## Read TF association table ##
 ###############################
-tf.tab <- fread(opt$tf_assoc_table)
+tf.tab <- fread(tf.tab.file)
 colnames(tf.tab) <- c("ExpID", "Organism", "TF_name")
 
 
@@ -136,8 +141,11 @@ if(organism == "mouse"){
 
   
 } else if(organism == "human"){
-  
-  ## ROBIN: insert your code here!
+    human.tfs <- read.table("HumanTFs_Cell2018__gene_names.txt", header = F)[,1]
+    tail(sort(table(tf.tab$TF_name)))
+    table(tf.tab$TF_name %in% human.tfs)
+    
+    blacklist.TR[["human"]] <- tf.tab$TF_name[!(tf.tab$TF_name %in% human.tfs)]
 }
 
 
@@ -166,8 +174,8 @@ message("; # Unique datasets (after filtering): ", length(unique(tf.tab.keep$TF_
 #######################
 ## Export black list ##
 #######################
-message("; Exportin black list of non-DNA-binding transcriptional regulators")
-fwrite(data.table(blacklist.TR[["mouse"]]),
+message("; Exporting blacklist of non-DNA-binding transcriptional regulators")
+fwrite(data.table(blacklist.TR[[organism]]),
        file = paste0("Blacklist_non-DNA_binding_transcriptional_regulation_", organism, ".txt"),
        col.names = F, row.names = F,
        sep = "\t")
