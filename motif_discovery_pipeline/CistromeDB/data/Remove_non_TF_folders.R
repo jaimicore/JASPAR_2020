@@ -159,10 +159,6 @@ tf.tab.remove <- tf.tab %>%
 message("; # Experiments (before filtering): ", nrow(tf.tab), " - Organism: ", organism)
 message("; # Unique datasets (before filtering): ", length(unique(tf.tab$TF_name)), " - Organism: ", organism)
 
-message("; # Experiments (after filtering): ", nrow(tf.tab.keep), " - Organism: ", organism)
-message("; # Unique datasets (after filtering): ", length(unique(tf.tab.keep$TF_name)), " - Organism: ", organism)
-
-
 #######################
 ## Export black list ##
 #######################
@@ -184,3 +180,30 @@ sapply(as.vector((tf.tab.remove$ExpID)), function(folder.id){
          recursive = TRUE)
 })
 
+
+#################################################
+## Remove folders when NarroPeak file is empty ##
+#################################################
+rm.files.counter <- 0
+sapply(as.vector((tf.tab.keep$ExpID)), function(folder.id){
+  
+  # 73253
+  
+  narrow.peak.file <- file.path(data.folder, folder.id, paste0(folder.id, "_peaks.narrowPeak"))
+  # print(narrow.peak.file)
+  # narrow.peak.folder <- file.path(data.folder, folder.id)
+
+  ## Check the file size of the downloaded file
+  ## Delete the file and its folder when the file is empty
+  if(file.exists(narrow.peak.file)){
+    if(file.size(narrow.peak.file) == 0){
+      file.remove(narrow.peak.file)
+      unlink(dirname(narrow.peak.file), recursive = TRUE)
+      message("; Removed file: ", narrow.peak.file)
+      rm.files.counter <<- rm.files.counter + 1
+    }
+  }
+})
+message("; Deleted folders (empty files): ", rm.files.counter)
+message("; # Experiments (after filtering): ", nrow(tf.tab.keep), " - Organism: ", organism)
+message("; # Unique datasets (after filtering): ", (length(unique(tf.tab.keep$TF_name)) - rm.files.counter), " - Organism: ", organism)
