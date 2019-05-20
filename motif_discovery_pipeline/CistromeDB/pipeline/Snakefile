@@ -4,7 +4,7 @@ import os
 import itertools
 import subprocess
 from snakemake.utils import R
-# configfile: "config.yaml"
+configfile: "config_mouse.yaml"
 
 
 ##########################
@@ -110,8 +110,8 @@ rule all:
            CENTRIMO_BEST, \
            MOST_ENRICHED_MOTIF_ASSOC, \
            MOST_ENRICHED_MOTIF_ASSOC_LOGO, \
-           MOTIFS_TO_CURATE, \
-           os.path.join(config["curation_dir"], "Selected_motifs_to_curate_log10_pval_-200.pdf"), \
+           # MOTIFS_TO_CURATE, \
+           # os.path.join(config["curation_dir"], "Selected_motifs_to_curate_log10_pval_-200.pdf"), \
 
 
 
@@ -258,6 +258,9 @@ rule RSAT_PSSM_to_JASPAR_format:
         out_dir = os.path.join(config["out_dir"], "{TF}", "motifs", "jaspar", "pfm", "{TF}", )
     shell:
         """
+
+        mkdir -p {params.out_dir} ;
+
         {params.RSAT}/perl-scripts/convert-matrix -v 2 \
         -from tf -to jaspar \
         -i {input} \
@@ -534,33 +537,6 @@ rule choose_best_centrimo_experiment:
         """
 
 
-## NOTE 4: the awk variables are relative to the ChIP-atlas experiment table.
-# rule annotate_best_centrimo_experiment:
-#     """
-#     Assing the TF name to the selected motif.
-
-#     This rule is executed for the best experiment of each dataset (experiment).
-#     """
-#     input:
-#         tf_jaspar_map = config["TF_Experiment_map"],
-#         best_exp = os.path.join(config["out_dir"], "{TF}", "central_enrichment", "selected_motif", "{TF}.501bp.fa.sites.centrimo.best")
-#     output:
-#         os.path.join(config["out_dir"], "{TF}", "central_enrichment", "selected_motif", "{TF}.501bp.fa.sites.centrimo.best.TF_associated")
-#     message:
-#         "; Assigning TF name to the experiment: {wildcards.TF} "
-#     priority:
-#         86
-#     shell:
-#         """
-#         motif_name="$(more {input.best_exp} | cut -f1 | xargs basename | cut -d'.' -f1 | perl -lne '$_ =~ s/_m(\\d+)$/_peak-motifs_m$1/g; print $_ ')";
-
-#         motif_folder="$(more {input.best_exp} | cut -f1 | xargs dirname | perl -lne '$_ =~ s/central_enrichment/motifs\/jaspar\/logos/gi; print $_')";
-
-#         ##  -v: Pass variable as arguments
-#         ##
-#         awk -v motif_n=$motif_name -v motif_f=$motif_folder 'NR==FNR{{mapping[$11] = $1}} NR!=FNR{{split($1, arr, "/"); split(arr[3], enc, "_"); print enc[1]"\\t"enc[3]"\\t"enc[3]"\\t"$0"\\t"motif_f"/"motif_n"_logo.png"}}' {input.tf_jaspar_map} {input.best_exp} > {output}
-#         """
-
 rule annotate_best_centrimo_experiment:
     """
     Assign the TF name to the selected motif.
@@ -665,3 +641,9 @@ rule Motifs_to_curate_PDF:
 
         pdfunite $PDF_FILES {output}
         """
+
+       # mkdir -p /storage/scratch/JASPAR_2020/jaspar_2020/motif_discovery_pipeline/CistromeDB/CistromeDB_results/mouse/54713/motifs/jaspar/pfm/54713 ;
+
+       #  /lsc/rsat/perl-scripts/convert-matrix -v 2         -from tf -to jaspar         -i /storage/scratch/JASPAR_2020/jaspar_2020/motif_discovery_pipeline/CistromeDB/CistromeDB_results/mouse/54713/peak-motifs/results/discovered_motifs/54713_motifs_discovered.tf         -return counts         -split         -prefix peak-motifs         -o /storage/scratch/JASPAR_2020/jaspar_2020/motif_discovery_pipeline/CistromeDB/CistromeDB_results/mouse/54713/motifs/jaspar/pfm/54713 ;
+
+       #  /lsc/rsat/perl-scripts/convert-matrix -v 2         -from tf -to tab         -i /storage/scratch/JASPAR_2020/jaspar_2020/motif_discovery_pipeline/CistromeDB/CistromeDB_results/mouse/54713/peak-motifs/results/discovered_motifs/54713_motifs_discovered.tf         -return counts         -split         -prefix peak-motifs         -o /storage/scratch/JASPAR_2020/jaspar_2020/motif_discovery_pipeline/CistromeDB/CistromeDB_results/mouse/54713/motifs/jaspar/pfm/54713
