@@ -106,7 +106,8 @@ curation.tab <- curation.tab[,c("PWM", "Organism", "current_BASE_ID", "current_V
 ###########################################################
 ## TFs not in JASPAR
 curation.no.jaspar.tab <- curation.tab %>%
-                          dplyr::filter(!`TF name` %in% jaspar.TF.names)
+                          dplyr::filter(!`TF name` %in% jaspar.TF.names) %>% 
+                          arrange(`TF name`)
 
 message("; Number of datasets: ", nrow(curation.tab))
 message("; Number of unique TFs: ", length(unique(curation.tab$`TF name`)))
@@ -138,3 +139,27 @@ curation.no.jaspar.PDFs <- paste(curation.no.jaspar.PDFs, collapse = " ")
 concat.pdf.file <- file.path(data.folder, paste0("Motifs_to_curate_logos_CistromeDB", organism, ".PDF"))
 concat.pdf.cmd <- paste0("pdfunite ", curation.no.jaspar.PDFs, " ", concat.pdf.file)
 system(concat.pdf.cmd)
+
+
+#############################
+## Split table in N chunks ##
+#############################
+# chunk1 <- sample(unique(curation.no.jaspar.tab$`TF name`), size = round(length(unique(curation.no.jaspar.tab$`TF name`))/2), replace = FALSE)
+# chunk2 <- unique(curation.no.jaspar.tab$`TF name`)[!unique(curation.no.jaspar.tab$`TF name`) %in% chunk1]
+# # print(chunk1)
+# # print(chunk2)
+# 
+# sum(grepl(chunk1, pattern = "ZNF"))
+# sum(grepl(chunk2, pattern = "ZNF"))
+# 
+# curation.chunk.1 <- curation.no.jaspar.tab %>% 
+#   dplyr::filter(`TF name` %in% chunk1)
+# 
+# curation.chunk.2 <- curation.no.jaspar.tab %>% 
+#   dplyr::filter(`TF name` %in% chunk2)
+# 
+# curation.no.jaspar.tab.file <- file.path(data.folder, paste0("Curation_table_not_in_JASPAR_", organism, "_chunk1.tab"))
+# fwrite(curation.chunk.1, curation.no.jaspar.tab.file, sep = "\t")
+# 
+# curation.no.jaspar.tab.file <- file.path(data.folder, paste0("Curation_table_not_in_JASPAR_", organism, "_chunk2.tab"))
+# fwrite(curation.chunk.2, curation.no.jaspar.tab.file, sep = "\t")
