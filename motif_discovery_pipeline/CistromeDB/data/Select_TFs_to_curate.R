@@ -44,7 +44,23 @@ result <- fromJSON(jaspar.url)
 
 ## Create a dataframe with the motifs info
 jaspar.tab <- data.table(result$results)
-curation.tab <- toupper(unique(jaspar.tab$name))
+jaspar.TF.names <- toupper(unique(jaspar.tab$name))
+
+
+# human.factor.list <- list.files("/storage/scratch/JASPAR_2020/jaspar_2020/motif_discovery_pipeline/CistromeDB/data/DATA_FILES/human_factor/")
+# human.factor.names.tab <- fread('/storage/scratch/JASPAR_2020/jaspar_2020/motif_discovery_pipeline/CistromeDB/data/CistromeDB_human_experiment_map.txt')
+# 
+# human.factor.names.tab <- human.factor.names.tab %>% 
+#   dplyr::filter(V1 %in% human.factor.list)
+# 
+# length(table(human.factor.names.tab$V3)) # 6715 datasets, 902 TFs, 557 new, 291 zinc fingers
+# 
+# sum(!toupper(unique(human.factor.names.tab$V3)) %in% curation.tab)
+# unique(human.factor.names.tab$V3)[!toupper(unique(human.factor.names.tab$V3)) %in% curation.tab]
+# 
+# sum(
+# grepl(unique(human.factor.names.tab$V3)[!toupper(unique(human.factor.names.tab$V3)) %in% curation.tab], pattern = "^ZNF")
+# )
 
 
 ##############################################
@@ -106,12 +122,14 @@ curation.tab <- curation.tab[,c("PWM", "Organism", "current_BASE_ID", "current_V
 ###########################################################
 ## TFs not in JASPAR
 curation.no.jaspar.tab <- curation.tab %>%
-                          dplyr::filter(`TF name` %in% curation.tab)
+                          dplyr::filter(!`TF name` %in% jaspar.TF.names)
 
 message("; Number of datasets: ", nrow(curation.tab))
 message("; Number of unique TFs: ", length(unique(curation.tab$`TF name`)))
 message("; Number of datasets not in JASPAR: ", nrow(curation.no.jaspar.tab))
+message("; Number of unique TFs: ", length(unique(curation.no.jaspar.tab$`TF name`)))
 
+sort(unique(curation.no.jaspar.tab$`TF name`))
 
 #########################################
 ## Export table with TFS not in JASPAR ##
