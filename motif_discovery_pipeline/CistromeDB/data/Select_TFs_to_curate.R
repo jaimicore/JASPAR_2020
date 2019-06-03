@@ -32,7 +32,7 @@ data.folder <- opt$data_folder
 
 # organism <- "mouse"
 # data.folder <- "/run/user/280010/gvfs/sftp:host=biotin3.hpc.uio.no,user=jamondra/storage/scratch/JASPAR_2020/jaspar_2020/motif_discovery_pipeline/CistromeDB/CistromeDB_results/curation"
-# data.folder <- "/storage/scratch/JASPAR_2020/jaspar_2020/motif_discovery_pipeline/CistromeDB/CistromeDB_results/curation"
+# # data.folder <- "/storage/scratch/JASPAR_2020/jaspar_2020/motif_discovery_pipeline/CistromeDB/CistromeDB_results/curation"
 data.folder <- file.path(data.folder, organism)
 
 
@@ -45,22 +45,6 @@ result <- fromJSON(jaspar.url)
 ## Create a dataframe with the motifs info
 jaspar.tab <- data.table(result$results)
 jaspar.TF.names <- toupper(unique(jaspar.tab$name))
-
-
-# human.factor.list <- list.files("/storage/scratch/JASPAR_2020/jaspar_2020/motif_discovery_pipeline/CistromeDB/data/DATA_FILES/human_factor/")
-# human.factor.names.tab <- fread('/storage/scratch/JASPAR_2020/jaspar_2020/motif_discovery_pipeline/CistromeDB/data/CistromeDB_human_experiment_map.txt')
-# 
-# human.factor.names.tab <- human.factor.names.tab %>% 
-#   dplyr::filter(V1 %in% human.factor.list)
-# 
-# length(table(human.factor.names.tab$V3)) # 6715 datasets, 902 TFs, 557 new, 291 zinc fingers
-# 
-# sum(!toupper(unique(human.factor.names.tab$V3)) %in% curation.tab)
-# unique(human.factor.names.tab$V3)[!toupper(unique(human.factor.names.tab$V3)) %in% curation.tab]
-# 
-# sum(
-# grepl(unique(human.factor.names.tab$V3)[!toupper(unique(human.factor.names.tab$V3)) %in% curation.tab], pattern = "^ZNF")
-# )
 
 
 ##############################################
@@ -87,13 +71,13 @@ curation.tab$TF <- toupper(curation.tab$TF)
 
 ## Add missing columns
 curation.tab$PWM <- gsub(curation.tab$Centrimo, pattern = "central_enrichment", replacement = "motifs/jaspar/pfm")
-curation.tab$PWM <- gsub(curation.tab$PWM[1], pattern = "(\\d+)_m(\\d+).+centrimo$", replacement = "\\1_peak-motifs_m\\2.jaspar", perl = T)
+curation.tab$PWM <- gsub(curation.tab$PWM, pattern = "(\\d+)_m(\\d+).+centrimo$", replacement = "\\1_peak-motifs_m\\2.jaspar", perl = T)
 
 curation.tab$BED <- gsub(curation.tab$Centrimo, pattern = "central_enrichment", replacement = "matrix_sites")
-curation.tab$BED <- gsub(curation.tab$PWM[1], pattern = "(\\d+)_m(\\d+).+centrimo$", replacement = "\\1_peak-motifs_m\\2.tf.sites.bed", perl = T)
+curation.tab$BED <- gsub(curation.tab$PWM, pattern = "(\\d+)_m(\\d+).+centrimo$", replacement = "\\1_peak-motifs_m\\2.tf.sites.bed", perl = T)
 
 curation.tab$FASTA <- gsub(curation.tab$Centrimo, pattern = "central_enrichment", replacement = "matrix_sites")
-curation.tab$FASTA <- gsub(curation.tab$PWM[1], pattern = "(\\d+)_m(\\d+).+centrimo$", replacement = "\\1_peak-motifs_m\\2.tf.sites.fasta", perl = T)
+curation.tab$FASTA <- gsub(curation.tab$PWM, pattern = "(\\d+)_m(\\d+).+centrimo$", replacement = "\\1_peak-motifs_m\\2.tf.sites.fasta", perl = T)
 
 curation.tab$Organism <- ""
 curation.tab$current_BASE_ID <- ""
@@ -136,3 +120,21 @@ sort(unique(curation.no.jaspar.tab$`TF name`))
 #########################################
 curation.no.jaspar.tab.file <- file.path(data.folder, paste0("Curation_table_not_in_JASPAR_", organism, ".tab"))
 fwrite(curation.no.jaspar.tab, curation.no.jaspar.tab.file, sep = "\t")
+
+
+######################################
+## Export PDF with motifs to curate ##
+######################################
+
+## Get the PDF file names
+curation.no.jaspar.PDFs <- gsub(curation.no.jaspar.tab$PWM,
+                                 pattern = "motifs/jaspar/pfm/(\\d+)_peak-motifs_m\\d+.jaspar",
+                                 replacement = "central_enrichment/selected_motif/\\1.501bp.fa.sites.centrimo.best.TF_associated.pdf")
+
+curation.no.jaspar.PDFs <- as.vector(curation.no.jaspar.PDFs)
+curation.no.jaspar.PDFs <- paste(curation.no.jaspar.PDFs, collapse = " ")
+
+## Concat PDFs command
+concat.pdf.file <- file.path(data.folder, paste0("Motifs_to_curate_logos_CistromeDB", organism, ".PDF"))
+concat.pdf.cmd <- paste0("pdfunite ", curation.no.jaspar.PDFs, " ", concat.pdf.file)
+system(concat.pdf.cmd)
