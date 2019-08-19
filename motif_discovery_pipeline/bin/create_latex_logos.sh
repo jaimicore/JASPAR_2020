@@ -10,6 +10,8 @@ $0 -l <latex header file> -i <input file> -o <output file>
 \n
 """;
 
+\usepackage[export]{adjustbox}
+
 TEMP=`getopt -o ho:i:l: -- "$@"`;
 
 if [ $? != 0 ]
@@ -53,16 +55,15 @@ fi;
 #latexheader="/home/rvdlee/JASPAR/jaimicore-jaspar_2020-a8db6feb9e0e/motif_discovery_pipeline/bin/latex_header.txt";
 cat $latexheader > $output;
 
-sort -k3,3 -k5,5n $input | \
-#more $input | \
+more $input | \
 while read line
 do
-    tfname=$(echo $line | cut -d ' ' -f 3 | tr '_' '-');
-    exp_ID=$(echo $line | cut -d ' ' -f 1 | tr '_' '-');
-    centrimo_file=$(echo $line | cut -d ' ' -f 4);
-    centrimo_pval=$(echo $line | cut -d ' ' -f 5);
+    tfname=$(echo $line | cut -d ' ' -f 2 | tr '_' '-');
+    exp_ID=$(echo $line | cut -d ' ' -f 9 | tr '_' '-');
+    #centrimo_file=$(echo $line | cut -d ' ' -f 16);
+    centrimo_pval=$(echo $line | cut -d ' ' -f 10);
     
-    motif_logo_original=$(echo $line | cut -d ' ' -f 6);
+    motif_logo_original=$(echo $line | cut -d ' ' -f 8);
     # echo "===========>  $motif_logo_original";
     motif_logo_original_dirname=$(dirname $motif_logo_original);
     # echo "===========>  $motif_logo_original_dirname";
@@ -75,7 +76,7 @@ do
     # this create a symbolic link so that that new motif filename will actually exist
     ln -s $motif_logo_original $motif_logo
 
-    motif_pdf=$(echo $line | cut -d ' ' -f 7);
+    motif_pdf=$(echo $line | cut -d ' ' -f 11);
     
     # tfname=$(echo $line | cut -f3 | tr '_' '-');
     # exp_ID=$(echo $line | cut -f1);
