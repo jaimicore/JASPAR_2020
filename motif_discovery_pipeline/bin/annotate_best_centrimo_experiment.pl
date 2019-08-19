@@ -161,8 +161,55 @@ my $logo_png_filepath = File::Spec->catfile($motif_folder, $motif . "_logo.png")
 
 
 ## create the output file
+# open(OUTFILE_FG, ">$output");
+# print OUTFILE_FG $exp_id . "\t" . $exp_tf . "\t" . $exp_tf . "\t" . $centrimo_best_file_name . "\t" . $centrimo_best_pvalue . "\t" . $logo_png_filepath . "\t" . $PDF_motif_info . "\n";
+# close(OUTFILE_FG);
+
+################################################################
+## Print table with ready to curate
+##
+## FIELDS:
+## 1) PWM path file
+## 2) current_BASE_ID
+## 3) current_VERSION
+## 4) TF NAME
+## 5) Uniprot
+## 6) TAX_ID
+## 7) class
+## 8) family
+## 9) TFBSshapeID
+## 10) Data
+## 11) Source
+## 12) Validation
+## 13) Comment	Addition or Upgrade or Non-validated (A or U or N )
+## 14) BED
+## 15) FASTA
+## 16) Centrality pval
+## 17) Centrality plot
+## 18) Motif logo path
+## 19) Experiment ID
+## 20) Centrality p-value
+## 21) PDF motif info
+
+$centrimo_best_file_name__basename =~ /^(\S+)(\.\d+bp\.fa\.sites\.centrimo)$/; # get the file extension, tricky because some worm ID contain a period, e.g. ce_OP532_Y116A8C.19_L1_WA_m5.501bp.fa.sites.centrimo	$1 will contain "ce_OP532_Y116A8C.19_L1_WA_m5", $2 will contain ".501bp.fa.sites.centrimo"
+$motif = $1;
+my $TF_exp_name = $1;
+$motif =~ s/_m(\d+)$/_peak-motifs_m$1/g;
+
+my $centrimo_best_file_pdf = $centrimo_best_file_name.".pdf";
+
+$motif_folder = dirname($centrimo_best_file_name);
+$motif_folder =~ s/central_enrichment/motifs\/jaspar\/pfm/gi;
+my $pwm_filepath = File::Spec->catfile($motif_folder, $motif.".jaspar");
+
+$motif_folder = dirname($centrimo_best_file_name);
+$motif_folder =~ s/central_enrichment/matrix_sites/gi;
+my $bed_filepath = File::Spec->catfile($motif_folder, $motif.".tf.sites.bed");
+my $fasta_filepath = File::Spec->catfile($motif_folder, $motif.".tf.sites.fasta");
+
+
 open(OUTFILE_FG, ">$output");
-print OUTFILE_FG $exp_id . "\t" . $exp_tf . "\t" . $exp_tf . "\t" . $centrimo_best_file_name . "\t" . $centrimo_best_pvalue . "\t" . $logo_png_filepath . "\t" . $PDF_motif_info . "\n"; 
+print OUTFILE_FG $pwm_filepath . "\t\t\t" . $exp_tf . "\t\t\t\t\t\t" . "ChIP-seq" . "\t\t\t\t" . $bed_filepath . "\t" . $fasta_filepath . "\t" . $centrimo_best_file_name . "\t" . $centrimo_best_file_pdf . "\t" . $logo_png_filepath . "\t" . $exp_id . "\t" . $centrimo_best_pvalue . "\t" . $PDF_motif_info . "\n"; 
 close(OUTFILE_FG);
 
 
