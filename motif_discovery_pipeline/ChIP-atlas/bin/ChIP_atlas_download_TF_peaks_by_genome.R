@@ -109,6 +109,7 @@ experiment.tab <- fread(exp.tab.parsed.file, sep = "\t", header = FALSE, fill = 
 colnames(experiment.tab) <- c("Experiment_ID", "genome", "Protein", "Cell_type_class", "Cell_type")
 
 ## Remove the GFP (input) and other protein entries from the table
+message("; Removing GFP experiments from the list")
 proteins.to.rm <- c("GFP", "Adenine N6-methylation")
 experiment.tab <- experiment.tab[!experiment.tab$Protein %in% proteins.to.rm, ]
 
@@ -121,18 +122,16 @@ experiment.tab <- experiment.tab[!experiment.tab$Protein %in% proteins.to.rm, ]
 g <- genome
   
 ## Select the entries with a given genome
+message("; Selecting,", g, " entries")
 experiment.tab.genome.parsed <- experiment.tab %>% 
-  filter(genome == g)
-
-## Select the entries with a given genome
-experiment.tab.genome.parsed <- experiment.tab %>% 
-  filter(genome == g)
+  dplyr::filter(genome == g)
 
 ## Parse the cell type names
 experiment.tab.genome.parsed$Cell_type <- as.vector(sapply(experiment.tab.genome.parsed$Cell_type, gsub, pattern = "\\s+", replacement = "-"))
 
 
 ## Generate download commands
+message("; Creating download commands")
 experiment.id.jaspar <- paste(experiment.tab.genome.parsed$Experiment_ID, 
                               experiment.tab.genome.parsed$Cell_type,
                               experiment.tab.genome.parsed$Protein,
@@ -146,6 +145,7 @@ experiment.id.jaspar <- gsub(experiment.id.jaspar, pattern = "\\.", replacement 
 experiment.tab.genome.parsed$Experiment_ID_JASPAR <- experiment.id.jaspar
 
 ## Remove: Epitope tag + BrdU entries
+message("; Removing: Epitope tag + BrdU entries")
 experiment.tab.genome.parsed <- experiment.tab.genome.parsed[!grepl(experiment.tab.genome.parsed$Experiment_ID_JASPAR, pattern = "Epitope tag", ignore.case = TRUE),]
 experiment.tab.genome.parsed <- experiment.tab.genome.parsed[!grepl(experiment.tab.genome.parsed$Experiment_ID_JASPAR, pattern = "Epitope", ignore.case = TRUE),]
 experiment.tab.genome.parsed <- experiment.tab.genome.parsed[!grepl(experiment.tab.genome.parsed$Experiment_ID_JASPAR, pattern = "BrdU", ignore.case = TRUE),]
@@ -163,7 +163,7 @@ experiment.tab.genome.parsed$URL <- paste0("http://dbarchive.biosciencedbc.jp/ky
 
 
 ## Parallel download
-plan(multiprocess, workers = 75)
+plan(multiprocess, workers = 15)
 trash <- future_sapply(1:nrow(experiment.tab.genome.parsed), function(n){
   
   ## Create folder before download
