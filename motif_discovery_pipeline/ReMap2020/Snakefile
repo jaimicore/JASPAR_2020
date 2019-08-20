@@ -4,8 +4,10 @@ import os
 import itertools
 import subprocess
 from snakemake.utils import R
+
 #configfile: "config_files/config_Hsapiens_hg38.yaml"
-configfile: "config_files/config_Hsapiens_hg38__3__.yaml"
+#configfile: "config_files/config_Hsapiens_hg38__3__.yaml"
+configfile: "config_files/config_Athaliana_TAIR10.yaml"
 
 
 ##########################
@@ -13,7 +15,8 @@ configfile: "config_files/config_Hsapiens_hg38__3__.yaml"
 ##########################
 
 ## Transcription Factor names
-(FOLDERS, ENCODE_TFs) = glob_wildcards(os.path.join(config["data_folder"], "{Folders}", "remap2020_{TF}_nr_macs2_hg38_v1_0.bed"))
+#(FOLDERS, ENCODE_TFs) = glob_wildcards(os.path.join(config["data_folder"], "{Folders}", "remap2020_{TF}_nr_macs2_hg38_v1_0.bed"))
+(FOLDERS, ENCODE_TFs) = glob_wildcards(os.path.join(config["data_folder"], "{Folders}", "remap2020_{TF}_nr_macs2_TAIR10_v1_0.bed"))
 
 ## Datasets whit at least one motif discovered by RSAT peak-motifs
 #(FO, TFs_w_MOTIF) = glob_wildcards(os.path.join(config["out_dir"], "{F}", "peak-motifs", "results", "discovered_motifs", "{TF}_motifs_discovered.tf"))
@@ -124,7 +127,8 @@ rule extract_peak_summits:
     Extract peak summits: chromosome, start, end
     """
     input:
-        os.path.join(config["data_folder"], "{TF}", "remap2020_{TF}_nr_macs2_hg38_v1_0.bed")
+        #os.path.join(config["data_folder"], "{TF}", "remap2020_{TF}_nr_macs2_hg38_v1_0.bed")
+        os.path.join(config["data_folder"], "{TF}", "remap2020_{TF}_nr_macs2_TAIR10_v1_0.bed")
     output:
         os.path.join(config["out_dir"], "{TF}", "peak_summits", "{TF}_peak_summits.bed")
     message:
@@ -132,8 +136,11 @@ rule extract_peak_summits:
     priority:
         100
     shell:
+        # """
+        # cut -f 1,7,8 {input} > {output}
+        # """
         """
-        cut -f 1,7,8 {input} > {output}
+        awk '{{ print "chr"$1"\\t"$7"\\t"$8}}' {input} > {output}
         """
 
 
@@ -578,7 +585,7 @@ rule best_centrimo_experiment_logo:
         85
     shell:
         """
-        bash {params.scripts_bin}/create_latex_logos_ReMAp.sh -l {params.scripts_bin}/latex_header.txt -i {input} -o {output}
+        bash {params.scripts_bin}/create_latex_logos.sh -l {params.scripts_bin}/latex_header.txt -i {input} -o {output}
         """
 
 
@@ -619,7 +626,7 @@ rule Select_motifs_to_curate:
         83
     shell:
         """
-        cat {input} | awk '{{ if ($20 <= {params.central_pval}) {{ print }} }}' | uniq > {output}
+        cat {input} | awk -F"\t" '{{ if ($20 <= {params.central_pval}) {{ print }} }}' | uniq > {output}
         """
 
 
