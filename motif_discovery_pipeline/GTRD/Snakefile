@@ -4,7 +4,7 @@ import os
 import itertools
 import subprocess
 from snakemake.utils import R
-#configfile: "config.yaml"
+configfile: "config_files/config_Athaliana_TAIR10.yaml"
 
 
 ##########################
@@ -621,7 +621,7 @@ rule Select_motifs_to_curate:
         83
     shell:
         """
-        cat {input} | awk '{{ if ($5 <= {params.central_pval}) {{ print }} }}' | uniq > {output}
+        cat {input} | awk '{{ if ($10 <= {params.central_pval}) {{ print }} }}' | uniq > {output}
         """
 
 
