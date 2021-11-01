@@ -4,7 +4,10 @@ import os
 import itertools
 import subprocess
 from snakemake.utils import R
-configfile: "config_files/config_Athaliana_TAIR10.yaml"
+
+#configfile: "config_files/config_Athaliana_TAIR10.yaml"
+#configfile: "config_files/config_Celegans_WBcel235.yaml"
+configfile: "config_files/config_fly_dm6.yaml"
 
 
 ##########################
