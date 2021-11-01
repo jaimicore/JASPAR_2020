@@ -24,9 +24,9 @@ author2: Robin_van_der_Lee
 ## === ##
 ## Bin ##
 ## === ##
-bin : /home/rvdlee/jaspar_2020/motif_discovery_pipeline/bin
+bin    : ../../bin
 python : python2.7
-RSAT : /sp1work/Tools/rsat
+RSAT   : /lsc/rsat
 
 
 ## ============================================= ##
@@ -44,11 +44,9 @@ central_pvalue : -200
 ## ============================================= ##
 ## Folders and required input files ##
 ## ============================================= ##
-data_folder : /home/rvdlee/jaspar_2020/motif_discovery_pipeline/CistromeDB/data/DATA_FILES/mouse_factor
-TF_Experiment_map : /home/rvdlee/jaspar_2020/motif_discovery_pipeline/CistromeDB/data/DATA_FILES/CistromeDB_mouse_experiment_map.txt
-genome_fasta : /sp1work/Genomes/mm10/mm10.fa
-genome_size : /sp1work/Genomes/mm10/mm10.chrom.sizes
-out_dir : /sp2work/rvdlee/CistromeDB/RESULTS/CistromeDB_mouse/output
-#out_dir : /home/rvdlee/jaspar_2020/motif_discovery_pipeline/CistromeDB/RESULTS/CistromeDB_mouse/output
-curation_dir : /sp2work/rvdlee/CistromeDB/RESULTS/CistromeDB_mouse/curation
-#curation_dir : /home/rvdlee/jaspar_2020/motif_discovery_pipeline/CistromeDB/RESULTS/CistromeDB_mouse/curation
+data_folder       : /storage/mathelierarea/processed/jamondra/Projects/JASPAR/JASPAR_2020/Correct_number_sites/JASPAR_2020/motif_discovery_pipeline/CistromeDB/data/DATA_FILES/mouse_factor
+TF_Experiment_map : /storage/mathelierarea/processed/JASPAR_2020/jaspar_2020/motif_discovery_pipeline/CistromeDB/data/CistromeDB_mouse_experiment_map.txt
+genome_fasta      : /storage/mathelierarea/raw/UCSC/mm10/mm10.fa
+genome_size       : /storage/mathelierarea/raw/UCSC/mm10/mm10.chrom.sizes
+out_dir           : /storage/mathelierarea/processed/jamondra/Projects/JASPAR/JASPAR_2020/Correct_number_sites/JASPAR_2020/motif_discovery_pipeline/CistromeDB/results/CistromeDB_mouse
+curation_dir      : /storage/mathelierarea/processed/jamondra/Projects/JASPAR/JASPAR_2020/Correct_number_sites/JASPAR_2020/motif_discovery_pipeline/CistromeDB/results/CistromeDB_mouse/curation
