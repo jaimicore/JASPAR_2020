@@ -44,10 +44,10 @@ central_pvalue : -200
 ## =============================================================== ##
 ## Arabidopsis thaliana (TAIR10): folders and required input files ##
 ## =============================================================== ##
-data_folder : /storage/scratch/JASPAR_2020/jaspar_2020/motif_discovery_pipeline/ReMap2020/data/TAIR10/
-genome_fasta : /storage/scratch/JASPAR_2020/jaspar_2020/motif_discovery_pipeline/GTRD/data/genomes/TAIR10/TAIR10.fa
-genome_size : /storage/scratch/JASPAR_2020/jaspar_2020/motif_discovery_pipeline/GTRD/data/genomes/TAIR10/TAIR10.chrom.sizes
-TF_Experiment_map : /storage/scratch/JASPAR_2020/jaspar_2020/motif_discovery_pipeline/ReMap2020/TF_TAIR10_mapping_table.tab
-curation_dir : results/TAIR10/curation/ReMap_At_TAIR10
-out_dir : results/TAIR10/
-genome: TAIR10
+data_folder       : /storage/mathelierarea/processed/jamondra/Projects/JASPAR/JASPAR_2020/Correct_number_sites/JASPAR_2020/motif_discovery_pipeline/ReMap2020/data/TAIR10
+genome_fasta      : /storage/mathelierarea/processed/JASPAR_2020/jaspar_2020/motif_discovery_pipeline/GTRD/data/genomes/TAIR10/TAIR10.fa
+genome_size       : /storage/mathelierarea/processed/JASPAR_2020/jaspar_2020/motif_discovery_pipeline/GTRD/data/genomes/TAIR10/TAIR10.chrom.sizes
+TF_Experiment_map : /storage/mathelierarea/processed/JASPAR_2020/jaspar_2020/motif_discovery_pipeline/ReMap2020/TF_TAIR10_mapping_table.tab
+curation_dir      : /storage/mathelierarea/processed/jamondra/Projects/JASPAR/JASPAR_2020/Correct_number_sites/JASPAR_2020/motif_discovery_pipeline/ReMap2020/results/TAIR10/curation
+out_dir           : /storage/mathelierarea/processed/jamondra/Projects/JASPAR/JASPAR_2020/Correct_number_sites/JASPAR_2020/motif_discovery_pipeline/ReMap2020/results/TAIR10/
+genome            : TAIR10
